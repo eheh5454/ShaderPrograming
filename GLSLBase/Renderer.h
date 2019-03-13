@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <random>
 
 #include "Dependencies\glew.h"
 #include "Dependencies\wglew.h"
@@ -22,6 +23,12 @@ public:
 	   
 	void Test();
 
+	void MyRenderer();
+
+	void GenQuads(int num);
+
+	void Draw_Quads();
+
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
 	bool ReadFile(char* filename, std::string *target);
@@ -36,6 +43,10 @@ private:
 	unsigned int m_WindowSizeY = 0;
 
 	GLuint m_VBORect = 0;
+	GLuint m_VBOLecture = 0;
+	GLuint m_QuadRect = 0; //ÄõµåÀü¿ë VBO
 	GLuint m_SolidRectShader = 0;
+
+	int Quad_num = 0;
 };
 

@@ -4,6 +4,10 @@
 #include <Windows.h>
 #include <cstdlib>
 #include <cassert>
+#include <time.h>
+
+
+using namespace std;
 
 Renderer::Renderer(int windowSizeX, int windowSizeY)
 {
@@ -39,7 +43,21 @@ void Renderer::CreateVertexBufferObjects()
 
 	glGenBuffers(1, &m_VBORect);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBORect);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(rect), rect, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(rect), rect, GL_STATIC_DRAW);	
+
+	/*lecture2*/
+	float myrect[]
+		=
+	{
+		-0.5, -0.5, 0.f, 0.f, 0.5, 0.f, 0.5, -0.5, 0.f //Triangle1
+		
+	};
+
+	glGenBuffers(1, &m_VBOLecture);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOLecture);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(myrect), myrect, GL_STATIC_DRAW);
+
+	GenQuads(100);
 }
 
 void Renderer::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType)
@@ -279,4 +297,93 @@ void Renderer::Test()
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	glDisableVertexAttribArray(attribPosition);
+}
+
+void Renderer::MyRenderer()
+{
+	glUseProgram(m_SolidRectShader);	
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOLecture);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	
+
+	glDisableVertexAttribArray(0);
+
+}
+
+
+
+void Renderer::GenQuads(int num)
+{
+	Quad_num = num;
+
+	default_random_engine dre;
+
+	dre.seed(time(NULL));
+
+	uniform_real_distribution<float> urd(-1.f, 1.f);
+
+	int vertex_size = Quad_num * 3 * 6;
+
+	float *Quad_vertex = new float[vertex_size];
+
+	float quad_size = 0.01f;
+
+	for (int i = 0; i < Quad_num; i++)
+	{
+		int index = i * 18;
+
+		float new_x = urd(dre);
+		float new_y = urd(dre);		
+		
+		Quad_vertex[index] = new_x - quad_size; index++;
+		Quad_vertex[index] = new_y - quad_size; index++;
+		Quad_vertex[index] = 0.f; index++;
+
+		Quad_vertex[index] = new_x - quad_size; index++;
+		Quad_vertex[index] = new_y + quad_size; index++;
+		Quad_vertex[index] = 0.f; index++;
+
+		Quad_vertex[index] = new_x + quad_size; index++;
+		Quad_vertex[index] = new_y + quad_size; index++;
+		Quad_vertex[index] = 0.f; index++;
+
+		Quad_vertex[index] = new_x - quad_size; index++;
+		Quad_vertex[index] = new_y - quad_size; index++;
+		Quad_vertex[index] = 0.f; index++;
+
+		Quad_vertex[index] = new_x + quad_size; index++;
+		Quad_vertex[index] = new_y + quad_size; index++;
+		Quad_vertex[index] = 0.f; index++;
+
+		Quad_vertex[index] = new_x + quad_size; index++;
+		Quad_vertex[index] = new_y - quad_size; index++;
+		Quad_vertex[index] = 0.f;
+
+	}
+
+	
+
+
+	glGenBuffers(1, &m_QuadRect);
+	glBindBuffer(GL_ARRAY_BUFFER, m_QuadRect);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertex_size, Quad_vertex, GL_STATIC_DRAW); //동적배열은 크기 못잼)
+}
+
+
+void Renderer::Draw_Quads()
+{
+	glUseProgram(m_SolidRectShader);
+
+	
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, m_QuadRect);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+
+	glDrawArrays(GL_TRIANGLES, 0, 6 * Quad_num * 3);	
+
+	glDisableVertexAttribArray(0);
+	
 }
