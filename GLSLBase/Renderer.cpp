@@ -57,8 +57,90 @@ void Renderer::CreateVertexBufferObjects()
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBOLecture);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(myrect), myrect, GL_STATIC_DRAW);
 
-	GenQuads(100);
+	//GenQuads(100);
+	CreateGridMesh();
 }
+
+void Renderer::CreateGridMesh()
+{
+	float basePosX = -0.5f;
+	float basePosY = -0.5f;
+	float targetPosX = 0.5f;
+	float targetPosY = 0.5f;
+
+	int pointCountX = 32;
+	int pointCountY = 32;
+
+	float width = targetPosX - basePosX;
+	float height = targetPosY - basePosY;
+
+	float* point = new float[pointCountX*pointCountY * 2];
+	float* vertices = new float[(pointCountX - 1)*(pointCountY - 1) * 2 * 3 * 3];
+	m_GridMesh_Count = (pointCountX - 1)*(pointCountY - 1) * 2 * 3;
+
+	//Prepare points
+	for (int x = 0; x < pointCountX; x++)
+	{
+		for (int y = 0; y < pointCountY; y++)
+		{
+			point[(y*pointCountX + x) * 2 + 0] = basePosX + width * (x / (float)(pointCountX - 1));
+			point[(y*pointCountX + x) * 2 + 1] = basePosY + height * (y / (float)(pointCountY - 1));
+		}
+	}
+
+	//Make triangles
+	int vertIndex = 0;
+	for (int x = 0; x < pointCountX - 1; x++)
+	{
+		for (int y = 0; y < pointCountY - 1; y++)
+		{
+			//Triangle part 1
+			vertices[vertIndex] = point[(y*pointCountX + x) * 2 + 0];
+			vertIndex++;
+			vertices[vertIndex] = point[(y*pointCountX + x) * 2 + 1];
+			vertIndex++;
+			vertices[vertIndex] = 0.f;
+			vertIndex++;
+			vertices[vertIndex] = point[((y + 1)*pointCountX + (x + 1)) * 2 + 0];
+			vertIndex++;
+			vertices[vertIndex] = point[((y + 1)*pointCountX + (x + 1)) * 2 + 1];
+			vertIndex++;
+			vertices[vertIndex] = 0.f;
+			vertIndex++;
+			vertices[vertIndex] = point[((y + 1)*pointCountX + x) * 2 + 0];
+			vertIndex++;
+			vertices[vertIndex] = point[((y + 1)*pointCountX + x) * 2 + 1];
+			vertIndex++;
+			vertices[vertIndex] = 0.f;
+			vertIndex++;
+
+			//Triangle part 2
+			vertices[vertIndex] = point[(y*pointCountX + x) * 2 + 0];
+			vertIndex++;
+			vertices[vertIndex] = point[(y*pointCountX + x) * 2 + 1];
+			vertIndex++;
+			vertices[vertIndex] = 0.f;
+			vertIndex++;
+			vertices[vertIndex] = point[(y*pointCountX + (x + 1)) * 2 + 0];
+			vertIndex++;
+			vertices[vertIndex] = point[(y*pointCountX + (x + 1)) * 2 + 1];
+			vertIndex++;
+			vertices[vertIndex] = 0.f;
+			vertIndex++;
+			vertices[vertIndex] = point[((y + 1)*pointCountX + (x + 1)) * 2 + 0];
+			vertIndex++;
+			vertices[vertIndex] = point[((y + 1)*pointCountX + (x + 1)) * 2 + 1];
+			vertIndex++;
+			vertices[vertIndex] = 0.f;
+			vertIndex++;
+		}
+	}
+
+	glGenBuffers(1, &m_VBOGridMesh);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOGridMesh);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*(pointCountX - 1)*(pointCountY - 1) * 2 * 3 * 3, vertices, GL_STATIC_DRAW);
+}
+
 
 void Renderer::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType)
 {
@@ -291,10 +373,10 @@ void Renderer::Test()
 
 	int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
 	glEnableVertexAttribArray(attribPosition);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBORect);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOGridMesh);
 	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
 
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDrawArrays(GL_LINE_STRIP, 0, m_GridMesh_Count);
 
 	glDisableVertexAttribArray(attribPosition);
 }
@@ -363,9 +445,7 @@ void Renderer::GenQuads(int num)
 		Quad_vertex[index] = 0.f;
 
 	}
-
 	
-
 
 	glGenBuffers(1, &m_QuadRect);
 	glBindBuffer(GL_ARRAY_BUFFER, m_QuadRect);

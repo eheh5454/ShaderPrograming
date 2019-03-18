@@ -29,6 +29,8 @@ public:
 
 	void Draw_Quads();
 
+	void CreateGridMesh();
+
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
 	bool ReadFile(char* filename, std::string *target);
@@ -48,5 +50,10 @@ private:
 	GLuint m_SolidRectShader = 0;
 
 	int Quad_num = 0;
+
+	GLuint m_VBOGridMesh = 0;
+	int m_GridMesh_Count = 0;
+
+
 };
 

@@ -30,7 +30,7 @@ void RenderScene(void)
 	
 	//g_Renderer->MyRenderer();
 
-	g_Renderer->Draw_Quads();
+	g_Renderer->Test();
 
 	glutSwapBuffers();
 }
