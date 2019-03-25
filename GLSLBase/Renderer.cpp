@@ -27,18 +27,25 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 
 	//Load shaders
 	m_SolidRectShader = CompileShaders("./Shaders/SolidRect.vs", "./Shaders/SolidRect.fs");
-	
+	m_SimpleVelShader = CompileShaders("./Shaders/SimpleVel.vs", "./Shaders/SimpleVel.fs");
+
 	//Create VBOs
 	CreateVertexBufferObjects();
 }
 
 void Renderer::CreateVertexBufferObjects()
 {
+
+	float rect_size = 0.02f;
 	float rect[]
 		=
 	{
-		-0.5, -0.5, 0.f, -0.5, 0.5, 0.f, 0.5, 0.5, 0.f, //Triangle1
-		-0.5, -0.5, 0.f,  0.5, 0.5, 0.f, 0.5, -0.5, 0.f, //Triangle2
+		-rect_size, -rect_size, 0.f,
+		-rect_size, rect_size, 0.f,
+		rect_size, rect_size, 0.f, //Triangle1
+		-rect_size, -rect_size, 0.f,
+		rect_size, rect_size, 0.f,
+		rect_size, -rect_size, 0.f, //Triangle2
 	};
 
 	glGenBuffers(1, &m_VBORect);
@@ -57,8 +64,37 @@ void Renderer::CreateVertexBufferObjects()
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBOLecture);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(myrect), myrect, GL_STATIC_DRAW);
 
-	//GenQuads(100);
-	CreateGridMesh();
+	//float 4자리를 사용한다. 
+	float rect_f4[]
+		=
+	{
+		-0.5, -0.5, 0.f, 0.5,
+		-0.5, 0.5, 0.f, 0.5,
+		0.5, 0.5, 0.f, 0.5, //Triangle1
+		-0.5, -0.5, 0.f, 0.5,
+		0.5, 0.5, 0.f, 0.5,
+		0.5, -0.5, 0.f, 0.5 //Triangle2
+	};
+
+	glGenBuffers(1, &m_VBORect4);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBORect4);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(rect_f4), rect_f4, GL_STATIC_DRAW);
+
+
+	float color[] =
+	{
+		1, 0, 0, 1, //r g b a
+		1, 0, 0, 1,
+		1, 0, 0, 1,
+		1, 0, 0, 1
+	};
+
+	glGenBuffers(1, &m_VBOColor);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOColor);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
+
+	GenQuads(1000);
+	//CreateGridMesh();
 }
 
 void Renderer::CreateGridMesh()
@@ -77,6 +113,8 @@ void Renderer::CreateGridMesh()
 	float* point = new float[pointCountX*pointCountY * 2];
 	float* vertices = new float[(pointCountX - 1)*(pointCountY - 1) * 2 * 3 * 3];
 	m_GridMesh_Count = (pointCountX - 1)*(pointCountY - 1) * 2 * 3;
+
+
 
 	//Prepare points
 	for (int x = 0; x < pointCountX; x++)
@@ -369,33 +407,71 @@ GLuint Renderer::CreateBmpTexture(char * filePath)
 
 void Renderer::Test()
 {
-	glUseProgram(m_SolidRectShader);
+	glUseProgram(m_SolidRectShader);	
 
-	int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
-	glEnableVertexAttribArray(attribPosition);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBOGridMesh);
-	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+	GLuint uTime = glGetUniformLocation(m_SolidRectShader, "u_Time");
+	glUniform1f(uTime, scale);
+	//scale = 1.f;
+	//glDrawArrays 에서 uTime에 항상 1값을 준다. 
 
-	glDrawArrays(GL_LINE_STRIP, 0, m_GridMesh_Count);
+	GLuint aPos = glGetAttribLocation(m_VBORect, "a_Position");
+	GLuint aCol = glGetAttribLocation(m_VBOColor, "a_Color");
 
-	glDisableVertexAttribArray(attribPosition);
+	glEnableVertexAttribArray(aPos);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBORect);
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0); //사이즈에 0을 줘도 됨(명확할 때만)
+
+	glEnableVertexAttribArray(aCol);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOColor);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 0); //사이즈에 0을 줘도 됨(명확할 때만)
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glDisableVertexAttribArray(aPos);
+	glDisableVertexAttribArray(aCol);	
+	
+
+	if (scale > 1.f)
+		scale_speed = -scale_speed;
+	else if(scale < 0.f)
+		scale_speed = -scale_speed;
+	
+	scale += scale_speed;
+
+	
+	
 }
 
-void Renderer::MyRenderer()
+void Renderer::DrawGrid()
 {
-	glUseProgram(m_SolidRectShader);	
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBOLecture);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glUseProgram(m_SolidRectShader);
 	
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOGridMesh);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+
+	glDrawArrays(GL_LINE_STRIP, 0, m_GridMesh_Count);
 
 	glDisableVertexAttribArray(0);
 
 }
 
+//4개씩 읽어라 
+void Renderer::Draw_f4()
+{
+	glUseProgram(m_SolidRectShader);
 
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBORect4);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 0); //이렇게도가능
+
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glDisableVertexAttribArray(0);
+}
 
 void Renderer::GenQuads(int num)
 {
@@ -407,7 +483,7 @@ void Renderer::GenQuads(int num)
 
 	uniform_real_distribution<float> urd(-1.f, 1.f);
 
-	int vertex_size = Quad_num * 3 * 6;
+	int vertex_size = Quad_num * 6 * 6;
 
 	float *Quad_vertex = new float[vertex_size];
 
@@ -415,36 +491,60 @@ void Renderer::GenQuads(int num)
 
 	for (int i = 0; i < Quad_num; i++)
 	{
-		int index = i * 18;
+		int index = i * 36;
 
 		float new_x = urd(dre);
 		float new_y = urd(dre);		
+		float Vel_x = urd(dre);
+		float Vel_y = urd(dre);
+		float Vel_z = 0.f;
+		
 		
 		Quad_vertex[index] = new_x - quad_size; index++;
 		Quad_vertex[index] = new_y - quad_size; index++;
 		Quad_vertex[index] = 0.f; index++;
+		Quad_vertex[index] = Vel_x; index++;
+		Quad_vertex[index] = Vel_y; index++;
+		Quad_vertex[index] = Vel_z; index++;
 
 		Quad_vertex[index] = new_x - quad_size; index++;
 		Quad_vertex[index] = new_y + quad_size; index++;
 		Quad_vertex[index] = 0.f; index++;
+		Quad_vertex[index] = Vel_x; index++;
+		Quad_vertex[index] = Vel_y; index++;
+		Quad_vertex[index] = Vel_z; index++;
 
 		Quad_vertex[index] = new_x + quad_size; index++;
 		Quad_vertex[index] = new_y + quad_size; index++;
 		Quad_vertex[index] = 0.f; index++;
+		Quad_vertex[index] = Vel_x; index++;
+		Quad_vertex[index] = Vel_y; index++;
+		Quad_vertex[index] = Vel_z; index++;
 
 		Quad_vertex[index] = new_x - quad_size; index++;
 		Quad_vertex[index] = new_y - quad_size; index++;
 		Quad_vertex[index] = 0.f; index++;
+		Quad_vertex[index] = Vel_x; index++;
+		Quad_vertex[index] = Vel_y; index++;
+		Quad_vertex[index] = Vel_z; index++;
 
 		Quad_vertex[index] = new_x + quad_size; index++;
 		Quad_vertex[index] = new_y + quad_size; index++;
 		Quad_vertex[index] = 0.f; index++;
+		Quad_vertex[index] = Vel_x; index++;
+		Quad_vertex[index] = Vel_y; index++;
+		Quad_vertex[index] = Vel_z; index++;
 
 		Quad_vertex[index] = new_x + quad_size; index++;
 		Quad_vertex[index] = new_y - quad_size; index++;
-		Quad_vertex[index] = 0.f;
+		Quad_vertex[index] = 0.f; index++;
+		Quad_vertex[index] = Vel_x; index++;
+		Quad_vertex[index] = Vel_y; index++;
+		Quad_vertex[index] = Vel_z;
 
 	}
+
+	
 	
 
 	glGenBuffers(1, &m_QuadRect);
@@ -467,3 +567,29 @@ void Renderer::Draw_Quads()
 	glDisableVertexAttribArray(0);
 	
 }
+
+void Renderer::Draw_SimpleVel()
+{
+	glUseProgram(m_SimpleVelShader);
+
+	GLuint uTime = glGetUniformLocation(m_SolidRectShader, "u_Time");
+	glUniform1f(uTime, scale);
+	scale += 0.0001f;
+
+	GLuint aPos = glGetAttribLocation(m_SimpleVelShader, "a_Position");
+	GLuint aVel = glGetAttribLocation(m_SimpleVelShader, "a_Vel");
+
+	glEnableVertexAttribArray(aPos);
+	glEnableVertexAttribArray(aVel);
+	glBindBuffer(GL_ARRAY_BUFFER, m_QuadRect);
+	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 0);
+	glVertexAttribPointer(aVel, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (GLvoid*)(sizeof(float)*3));
+
+	glDrawArrays(GL_TRIANGLES, 0, 6 * Quad_num * 3 * 2);
+	//glDrawArrays(GL_LINE_STRIP, 0, 6 * Quad_num * 3);
+
+	glDisableVertexAttribArray(aPos);
+	glDisableVertexAttribArray(aVel);
+	
+}
+

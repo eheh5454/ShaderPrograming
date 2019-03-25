@@ -28,9 +28,11 @@ void RenderScene(void)
 	// Renderer Test
 	//g_Renderer->Test();
 	
-	//g_Renderer->MyRenderer();
+	//g_Renderer->Draw_Quads();
 
-	g_Renderer->Test();
+	//g_Renderer->Draw_f4();
+
+	g_Renderer->Draw_SimpleVel();
 
 	glutSwapBuffers();
 }
