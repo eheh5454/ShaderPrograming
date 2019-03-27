@@ -38,6 +38,8 @@ public:
 
 	void Draw_SimpleVel();
 
+	void Lecture5();
+
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
 	bool ReadFile(char* filename, std::string *target);
@@ -64,7 +66,7 @@ private:
 	GLuint m_SimpleVelShader = 0;
 
 
-	float scale = 0.f;
+	float g_Time = 0.f;
 	float scale_speed = 0.0001f;
 
 	int Quad_num = 0;
@@ -75,6 +77,8 @@ private:
 
 	float x = 0.0001f; 
 	float y = 0.f;
+
+	int quad_vertex_count;
 
 
 };

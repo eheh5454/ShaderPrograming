@@ -32,7 +32,9 @@ void RenderScene(void)
 
 	//g_Renderer->Draw_f4();
 
-	g_Renderer->Draw_SimpleVel();
+	//g_Renderer->Draw_SimpleVel();
+
+	g_Renderer->Lecture5();
 
 	glutSwapBuffers();
 }
