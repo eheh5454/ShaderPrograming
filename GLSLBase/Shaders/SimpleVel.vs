@@ -1,12 +1,14 @@
 #version 450
 
 in vec3 a_Position;
+in vec3 a_Vel;
 in vec2 a_StartLife;
 in vec2 ratio_amp;
 
 uniform float u_Time;
 
 const float PI = 3.141592;
+const mat3 c_RP = mat3(0, -1, 0, 1, 0, 0, 0, 0, 0);
 
 void main()
 {    
@@ -18,11 +20,19 @@ void main()
 
 	float newTime = u_Time - startTime;	
 
+	float ratio = ratio_amp.x;
+
+	float amp = ratio_amp.y;
+	
+
 	if(newTime > 0)
 	{	    
 	    newTime = mod(newTime, lifeTime);
-	    newPos.x += newTime;
-		newPos.y += sin(newTime * 2 * PI * ratio_amp.x) * ratio_amp.y;
+
+		newPos = newPos + a_Vel * newTime;
+
+		vec3 vSin = a_Vel * c_RP;
+		newPos = newPos + vSin * sin(newTime * PI * 2 * ratio) * amp;
 	}
 	else
 	{

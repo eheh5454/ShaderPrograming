@@ -94,7 +94,7 @@ void Renderer::CreateVertexBufferObjects()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
 
 	//GenQuads(1000);
-	GenQuads_New(1000);
+	GenQuads_New(100);
 	//CreateGridMesh();
 }
 
@@ -785,14 +785,18 @@ void Renderer::Lecture6()
 	GLuint aPos = glGetAttribLocation(m_SimpleVelShader, "a_Position");	
 	GLuint ratio_amp = glGetAttribLocation(m_SimpleVelShader, "ratio_amp");
 	GLuint aStartLife = glGetAttribLocation(m_SimpleVelShader, "a_StartLife");
+	GLuint aVel = glGetAttribLocation(m_SimpleVelShader, "a_Vel");
 	
 	glEnableVertexAttribArray(aPos);
 	glEnableVertexAttribArray(aStartLife);
 	glEnableVertexAttribArray(ratio_amp);
+	glEnableVertexAttribArray(aVel);
+
 	
 	glBindBuffer(GL_ARRAY_BUFFER, m_QuadRect);
 	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, 0);
-	glVertexAttribPointer(aStartLife, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (GLvoid*)(sizeof(float) * 6));
+	glVertexAttribPointer(aVel, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (GLvoid*)(sizeof(float) * 3));
+	glVertexAttribPointer(aStartLife, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (GLvoid*)(sizeof(float) * 6));	
 	glVertexAttribPointer(ratio_amp, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (GLvoid*)(sizeof(float) * 8));
 
 	glDrawArrays(GL_TRIANGLES, 0, quad_vertex_count);
@@ -801,5 +805,5 @@ void Renderer::Lecture6()
 	glDisableVertexAttribArray(aPos);
 	glDisableVertexAttribArray(aStartLife);
 	glDisableVertexAttribArray(ratio_amp);
-
+	glDisableVertexAttribArray(aVel);
 }
