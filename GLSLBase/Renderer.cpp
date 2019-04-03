@@ -93,7 +93,8 @@ void Renderer::CreateVertexBufferObjects()
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBOColor);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
 
-	GenQuads(1000);
+	//GenQuads(1000);
+	GenQuads_New(1000);
 	//CreateGridMesh();
 }
 
@@ -485,7 +486,7 @@ void Renderer::GenQuads(int num)
 
 	uniform_real_distribution<float> urd_start_Time(0.f, 2.f);
 
-	uniform_real_distribution<float> urd_life_Time(0.f, 0.5f);	
+	uniform_real_distribution<float> urd_life_Time(0.f, 1.f);	
 
 	int verticesPerQuad = 6; //사각형당 필요한 버텍스 
 
@@ -579,6 +580,130 @@ void Renderer::GenQuads(int num)
 }
 
 
+//원점인 곳에 사각형 생성 
+void Renderer::GenQuads_New(int num)
+{
+	default_random_engine dre;
+
+	dre.seed(static_cast<unsigned int>(time(NULL)));
+
+	uniform_real_distribution<float> urd(-1.f, 1.f);
+
+	uniform_real_distribution<float> urd_start_Time(0.f, 2.f);
+
+	uniform_real_distribution<float> urd_life_Time(0.f, 1.f);
+
+	uniform_real_distribution<float> urd_ratio(1.f, 3.f); //주기 
+
+	uniform_real_distribution<float> urd_amp(0.f, 0.5f); //진폭 
+
+	int verticesPerQuad = 6; //사각형당 필요한 버텍스 
+
+	int floatsPerVertex = 3 + 3 + 2 + 2; //버텍스당 필요한 float 
+
+	int countQuad = num;
+
+	int vertex_size = countQuad * verticesPerQuad * floatsPerVertex;
+
+	float *Quad_vertex = new float[vertex_size];
+
+	float quad_size = 0.01f;
+
+	for (int i = 0; i < countQuad; i++)
+	{
+		int index = i * verticesPerQuad * floatsPerVertex;
+
+		float new_x = 0.f;
+		float new_y = 0.f;
+		float Vel_x = urd(dre);
+		float Vel_y = urd(dre);
+		float Vel_z = 0.f;
+		float startTime, lifeTime;
+		float new_ratio = urd_ratio(dre);
+		float new_amp = urd_amp(dre);
+	
+
+		startTime = urd_start_Time(dre);
+		lifeTime = urd_life_Time(dre);
+
+		Quad_vertex[index] = new_x - quad_size; index++;
+		Quad_vertex[index] = new_y - quad_size; index++;
+		Quad_vertex[index] = 0.f; index++;
+		Quad_vertex[index] = Vel_x; index++;
+		Quad_vertex[index] = Vel_y; index++;
+		Quad_vertex[index] = Vel_z; index++;
+		Quad_vertex[index] = startTime; index++;
+		Quad_vertex[index] = lifeTime; index++;
+		Quad_vertex[index] = new_ratio; index++;
+		Quad_vertex[index] = new_amp; index++;
+
+
+		Quad_vertex[index] = new_x - quad_size; index++;
+		Quad_vertex[index] = new_y + quad_size; index++;
+		Quad_vertex[index] = 0.f; index++;
+		Quad_vertex[index] = Vel_x; index++;
+		Quad_vertex[index] = Vel_y; index++;
+		Quad_vertex[index] = Vel_z; index++;
+		Quad_vertex[index] = startTime; index++;
+		Quad_vertex[index] = lifeTime; index++;
+		Quad_vertex[index] = new_ratio; index++;
+		Quad_vertex[index] = new_amp; index++;
+
+		Quad_vertex[index] = new_x + quad_size; index++;
+		Quad_vertex[index] = new_y + quad_size; index++;
+		Quad_vertex[index] = 0.f; index++;
+		Quad_vertex[index] = Vel_x; index++;
+		Quad_vertex[index] = Vel_y; index++;
+		Quad_vertex[index] = Vel_z; index++;
+		Quad_vertex[index] = startTime; index++;
+		Quad_vertex[index] = lifeTime; index++;
+		Quad_vertex[index] = new_ratio; index++;
+		Quad_vertex[index] = new_amp; index++;
+
+		Quad_vertex[index] = new_x - quad_size; index++;
+		Quad_vertex[index] = new_y - quad_size; index++;
+		Quad_vertex[index] = 0.f; index++;
+		Quad_vertex[index] = Vel_x; index++;
+		Quad_vertex[index] = Vel_y; index++;
+		Quad_vertex[index] = Vel_z; index++;
+		Quad_vertex[index] = startTime; index++;
+		Quad_vertex[index] = lifeTime; index++;
+		Quad_vertex[index] = new_ratio; index++;
+		Quad_vertex[index] = new_amp; index++;
+
+		Quad_vertex[index] = new_x + quad_size; index++;
+		Quad_vertex[index] = new_y + quad_size; index++;
+		Quad_vertex[index] = 0.f; index++;
+		Quad_vertex[index] = Vel_x; index++;
+		Quad_vertex[index] = Vel_y; index++;
+		Quad_vertex[index] = Vel_z; index++;
+		Quad_vertex[index] = startTime; index++;
+		Quad_vertex[index] = lifeTime; index++;
+		Quad_vertex[index] = new_ratio; index++;
+		Quad_vertex[index] = new_amp; index++;
+
+		Quad_vertex[index] = new_x + quad_size; index++;
+		Quad_vertex[index] = new_y - quad_size; index++;
+		Quad_vertex[index] = 0.f; index++;
+		Quad_vertex[index] = Vel_x; index++;
+		Quad_vertex[index] = Vel_y; index++;
+		Quad_vertex[index] = Vel_z; index++;
+		Quad_vertex[index] = startTime; index++;
+		Quad_vertex[index] = lifeTime; index++;
+		Quad_vertex[index] = new_ratio; index++;
+		Quad_vertex[index] = new_amp;
+
+	}
+
+
+	glGenBuffers(1, &m_QuadRect);
+	glBindBuffer(GL_ARRAY_BUFFER, m_QuadRect);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertex_size, Quad_vertex, GL_STATIC_DRAW); //동적배열은 크기 못잼)
+
+	quad_vertex_count = countQuad * verticesPerQuad * floatsPerVertex;
+}
+
+
 void Renderer::Draw_Quads()
 {
 	glUseProgram(m_SolidRectShader);
@@ -647,4 +772,34 @@ void Renderer::Lecture5()
 	glDisableVertexAttribArray(aPos);
 	glDisableVertexAttribArray(aVel);
 	glDisableVertexAttribArray(aStartLife);
+}
+
+void Renderer::Lecture6()
+{
+	glUseProgram(m_SimpleVelShader);
+
+	GLuint uTime = glGetUniformLocation(m_SimpleVelShader, "u_Time");
+	glUniform1f(uTime, g_Time);
+	g_Time += 0.0001f;
+
+	GLuint aPos = glGetAttribLocation(m_SimpleVelShader, "a_Position");	
+	GLuint ratio_amp = glGetAttribLocation(m_SimpleVelShader, "ratio_amp");
+	GLuint aStartLife = glGetAttribLocation(m_SimpleVelShader, "a_StartLife");
+	
+	glEnableVertexAttribArray(aPos);
+	glEnableVertexAttribArray(aStartLife);
+	glEnableVertexAttribArray(ratio_amp);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, m_QuadRect);
+	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, 0);
+	glVertexAttribPointer(aStartLife, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (GLvoid*)(sizeof(float) * 6));
+	glVertexAttribPointer(ratio_amp, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (GLvoid*)(sizeof(float) * 8));
+
+	glDrawArrays(GL_TRIANGLES, 0, quad_vertex_count);
+	//glDrawArrays(GL_LINE_STRIP, 0, 6 * Quad_num * 3);
+
+	glDisableVertexAttribArray(aPos);
+	glDisableVertexAttribArray(aStartLife);
+	glDisableVertexAttribArray(ratio_amp);
+
 }

@@ -30,6 +30,8 @@ public:
 
 	void GenQuads(int num);
 
+	void GenQuads_New(int num);
+
 	void Draw_Quads();
 
 	void CreateGridMesh();
@@ -39,6 +41,8 @@ public:
 	void Draw_SimpleVel();
 
 	void Lecture5();
+
+	void Lecture6();
 
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
