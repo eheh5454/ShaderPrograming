@@ -94,7 +94,7 @@ void Renderer::CreateVertexBufferObjects()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
 
 	//GenQuads(1000);
-	GenQuads_New(100);
+	GenQuads_New(500);
 	//CreateGridMesh();
 }
 
