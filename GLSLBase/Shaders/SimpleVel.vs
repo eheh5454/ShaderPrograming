@@ -4,12 +4,13 @@ in vec3 a_Position;
 in vec3 a_Vel;
 in vec2 a_StartLife;
 in vec2 ratio_amp;
+in float Value;
 
 uniform float u_Time;
 
 const float PI = 3.141592;
 const mat3 c_RP = mat3(0, -1, 0, 1, 0, 0, 0, 0, 0);
-const vec3 c_Gravity = vec3(0, -5, 0);
+const vec3 c_Gravity = vec3(0, -10, 0);
 
 void main()
 {    
@@ -24,11 +25,16 @@ void main()
 
 	float ratio = ratio_amp.x;
 
-	float amp = ratio_amp.y;
+	float amp = ratio_amp.y;	
+
+	float value = Value;
 	
 
 	if(newTime > 0)
-	{	    
+	{
+	    newPos.x += sin(value * PI * 2);
+		newPos.y += cos(value * PI * 2);
+
 	    newTime = mod(newTime, lifeTime);
 
 		newVel = newVel + c_Gravity * newTime;
