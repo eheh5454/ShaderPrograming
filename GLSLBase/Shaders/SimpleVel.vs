@@ -8,6 +8,8 @@ in float Value;
 in vec4 a_color;
 
 out vec4 v_color;
+out vec2 v_orixy;
+out float v_radius;
 
 uniform float u_Time;
 
@@ -19,6 +21,9 @@ void main()
 {    
 	vec3 newPos = a_Position.xyz;	
 	vec3 newVel = a_Vel.xyz;
+
+	v_orixy = a_Position.xy;
+	v_radius = abs(a_Position.x);
 
 	float startTime = a_StartLife.x;
 	
@@ -32,8 +37,7 @@ void main()
 
 	float value = Value;
 
-	float newalpha; 
-	
+	float newalpha; 	
 
 	if(newTime > 0)
 	{
