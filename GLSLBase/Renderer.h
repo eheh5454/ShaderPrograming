@@ -44,6 +44,8 @@ public:
 
 	void Lecture6();
 
+	void Lecture7();
+
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
 	bool ReadFile(char* filename, std::string *target);

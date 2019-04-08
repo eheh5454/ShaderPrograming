@@ -5,12 +5,15 @@ in vec3 a_Vel;
 in vec2 a_StartLife;
 in vec2 ratio_amp;
 in float Value;
+in vec4 a_color;
+
+out vec4 v_color;
 
 uniform float u_Time;
 
 const float PI = 3.141592;
 const mat3 c_RP = mat3(0, -1, 0, 1, 0, 0, 0, 0, 0);
-const vec3 c_Gravity = vec3(0, -10, 0);
+const vec3 c_Gravity = vec3(0, -1000, 0);
 
 void main()
 {    
@@ -28,6 +31,8 @@ void main()
 	float amp = ratio_amp.y;	
 
 	float value = Value;
+
+	float newalpha; 
 	
 
 	if(newTime > 0)
@@ -43,6 +48,8 @@ void main()
 
 		vec3 vSin = a_Vel * c_RP;
 		newPos = newPos + vSin * sin(newTime * PI * 2 * ratio) * amp;
+
+		newalpha = pow(1 - newTime / lifeTime, 30);
 	}
 	else
 	{
@@ -50,4 +57,6 @@ void main()
 	}
 	
 	gl_Position = vec4(newPos.xyz, 1);
+
+	v_color = vec4(a_color.xyz, newalpha);
 }
