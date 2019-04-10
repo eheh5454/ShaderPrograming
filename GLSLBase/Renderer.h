@@ -46,6 +46,8 @@ public:
 
 	void Lecture7();
 
+	void Lecture8();
+
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
 	bool ReadFile(char* filename, std::string *target);
@@ -65,11 +67,12 @@ private:
 	
 	GLuint m_VBORect4 = 0; 
 	GLuint m_VBOColor = 0;
-	
 
 	//shaders
 	GLuint m_SolidRectShader = 0;
 	GLuint m_SimpleVelShader = 0;
+
+	GLuint m_VBOUV = 0;
 
 
 	float g_Time = 0.f;

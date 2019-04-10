@@ -36,21 +36,35 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 void Renderer::CreateVertexBufferObjects()
 {
 
-	float rect_size = 0.02f;
+	float rect_size = 0.5f;
 	float rect[]
 		=
 	{
-		-rect_size, -rect_size, 0.f,
-		-rect_size, rect_size, 0.f,
-		rect_size, rect_size, 0.f, //Triangle1
-		-rect_size, -rect_size, 0.f,
-		rect_size, rect_size, 0.f,
-		rect_size, -rect_size, 0.f, //Triangle2
+		-rect_size, -rect_size, 0.f, 0.f, 0.f,
+		-rect_size, rect_size, 0.f, 0.f,1.f,
+		rect_size, rect_size, 0.f, 1.f,1.f, //Triangle1
+		-rect_size, -rect_size, 0.f, 0.f,0.f,
+		rect_size, rect_size, 0.f, 1.f,1.f,
+		rect_size, -rect_size, 0.f, 1.f,0.f //Triangle2
 	};
 
 	glGenBuffers(1, &m_VBORect);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBORect);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(rect), rect, GL_STATIC_DRAW);	
+
+	float uv[] =
+	{
+		0.f,0.f,
+		0.f,1.f,
+		1.f,1.f,
+		0.f,0.f,
+		1.f,1.f,
+		1.f,0.f
+
+	};
+	glGenBuffers(1, &m_VBOUV);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOUV);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(uv), uv, GL_STATIC_DRAW);
 
 	/*lecture2*/
 	float myrect[]
@@ -89,12 +103,12 @@ void Renderer::CreateVertexBufferObjects()
 		1, 0, 0, 1
 	};
 
-	glGenBuffers(1, &m_VBOColor);
+	/*glGenBuffers(1, &m_VBOColor);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBOColor);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);*/
 
 	//GenQuads(1000);
-	GenQuads_New(200000);
+	//GenQuads_New(200000);
 	//CreateGridMesh();
 }
 
@@ -892,4 +906,26 @@ void Renderer::Lecture7()
 	glDisableVertexAttribArray(aVel);
 	glDisableVertexAttribArray(Value);
 	glDisableVertexAttribArray(Color);
+}
+
+
+void Renderer::Lecture8()
+{
+	glUseProgram(m_SimpleVelShader);
+
+	GLuint aPos = glGetAttribLocation(m_SimpleVelShader, "a_Position");
+	GLuint aRG = glGetAttribLocation(m_SimpleVelShader, "a_RG");
+
+	glEnableVertexAttribArray(aPos);
+	glEnableVertexAttribArray(aRG);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBORect);
+	//glBindBuffer(GL_ARRAY_BUFFER, m_VBOUV);
+	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
+	glVertexAttribPointer(aRG, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (GLvoid*)(sizeof(float) * 3));
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glDisableVertexAttribArray(aPos);
+	glDisableVertexAttribArray(aRG);
 }

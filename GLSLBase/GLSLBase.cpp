@@ -34,7 +34,9 @@ void RenderScene(void)
 
 	//g_Renderer->Draw_SimpleVel();
 
-	g_Renderer->Lecture7();
+	//g_Renderer->Lecture7();
+
+	g_Renderer->Lecture8();
 
 	glutSwapBuffers();
 }
