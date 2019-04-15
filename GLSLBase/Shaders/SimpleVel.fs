@@ -6,7 +6,7 @@ in vec4 v_color;
 
 const vec2 c_Points[2] = { vec2(0, 0), vec2(0.1, 0.1) };
 
-uniform float u_Points[5];
+uniform vec2 u_Points[5];
 
 uniform float u_Time;
 
@@ -27,31 +27,29 @@ void main()
    }*/
 	//FragColor = vec4(grey); //동심원 만들기 
 
-	
 	//레이더에서 적군 원 그리기 
 	float pointGrey = 0;
 
-	for (int i = 0; i < 2; i++)
-	{
-		vec2 newPoint = c_Points[i];
-		vec2 newVec = newPoint - newUV;
-		float distance = length(newVec);
-		if(distance < 0.1)
-		{
-			pointGrey += 0.5 * pow(1-(distance/0.1),5);
-		}
-
-	}
-
 	float distance = length(newUV);
 	float newTime = fract(u_Time);
-	float ringWidth = 0.1;
+	float ringWidth = 0.1;	
 
 	if(distance < newTime + ringWidth && distance > newTime)
 	{
 		float temp = (distance - newTime)/ringWidth;
 		pointGrey = temp;
-	}
+
+		for (int i = 0; i < 5; i++)
+		{
+			vec2 newPoint = u_Points[i];
+			vec2 newVec = newPoint - newUV;
+			float distance = length(newVec);
+			if(distance < 0.1)
+			{
+				pointGrey += 0.5 * pow(1-(distance/0.1),5);
+			}
+		}
+	}	
 
 	FragColor = vec4(pointGrey);
 

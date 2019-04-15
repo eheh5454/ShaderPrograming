@@ -899,7 +899,7 @@ void Renderer::Lecture7()
 
 void Renderer::Lecture8()
 {
-	GLfloat points[] = { 0, 0, 0.5, 0.5, 0.3, 0.3, -0.2, -0.2};
+	GLfloat points[] = { 0, 0, 0.1, 0.1, 0.3, 0.3, -0.2, -0.2, -0.1, -0.1};
 
 	GLuint uPoints = glGetUniformLocation(m_SimpleVelShader, "u_Points");
 	glUniform2fv(uPoints, 5, points);
