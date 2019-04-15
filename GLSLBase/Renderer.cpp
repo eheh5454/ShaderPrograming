@@ -28,6 +28,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	//Load shaders
 	m_SolidRectShader = CompileShaders("./Shaders/SolidRect.vs", "./Shaders/SolidRect.fs");
 	m_SimpleVelShader = CompileShaders("./Shaders/SimpleVel.vs", "./Shaders/SimpleVel.fs");
+	m_FillAllShader = CompileShaders("./Shaders/FillAll.vs", "./Shaders/FillAll.fs");
 
 	//Create VBOs
 	CreateVertexBufferObjects();
@@ -36,7 +37,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 void Renderer::CreateVertexBufferObjects()
 {
 
-	float rect_size = 0.5f;
+	float rect_size = 1.f;
 	float rect[]
 		=
 	{
@@ -52,20 +53,7 @@ void Renderer::CreateVertexBufferObjects()
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBORect);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(rect), rect, GL_STATIC_DRAW);	
 
-	float uv[] =
-	{
-		0.f,0.f,
-		0.f,1.f,
-		1.f,1.f,
-		0.f,0.f,
-		1.f,1.f,
-		1.f,0.f
-
-	};
-	glGenBuffers(1, &m_VBOUV);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBOUV);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(uv), uv, GL_STATIC_DRAW);
-
+	
 	/*lecture2*/
 	float myrect[]
 		=
@@ -911,6 +899,15 @@ void Renderer::Lecture7()
 
 void Renderer::Lecture8()
 {
+	GLfloat points[] = { 0, 0, 0.5, 0.5, 0.3, 0.3, -0.2, -0.2};
+
+	GLuint uPoints = glGetUniformLocation(m_SimpleVelShader, "u_Points");
+	glUniform2fv(uPoints, 5, points);
+
+	GLuint uTime = glGetUniformLocation(m_SimpleVelShader, "u_Time");
+	glUniform1f(uTime, g_Time);
+	g_Time += 0.0001f;
+
 	glUseProgram(m_SimpleVelShader);
 
 	GLuint aPos = glGetAttribLocation(m_SimpleVelShader, "a_Position");
@@ -919,8 +916,7 @@ void Renderer::Lecture8()
 	glEnableVertexAttribArray(aPos);
 	glEnableVertexAttribArray(aRG);
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBORect);
-	//glBindBuffer(GL_ARRAY_BUFFER, m_VBOUV);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBORect);	
 	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
 	glVertexAttribPointer(aRG, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (GLvoid*)(sizeof(float) * 3));
 

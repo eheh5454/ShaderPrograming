@@ -5,7 +5,7 @@ in vec2 a_RG;
 
 out vec4 v_color;
 
-
+uniform float temp;
 
 void main()
 {   

@@ -48,6 +48,9 @@ public:
 
 	void Lecture8();
 
+	void FillAll();
+
+
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
 	bool ReadFile(char* filename, std::string *target);
@@ -71,6 +74,7 @@ private:
 	//shaders
 	GLuint m_SolidRectShader = 0;
 	GLuint m_SimpleVelShader = 0;
+	GLuint m_FillAllShader = 0;
 
 	GLuint m_VBOUV = 0;
 
