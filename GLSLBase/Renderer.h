@@ -76,7 +76,10 @@ private:
 	GLuint m_SimpleVelShader = 0;
 	GLuint m_FillAllShader = 0;
 
-	GLuint m_VBOUV = 0;
+	//textures
+	GLuint m_ParticleTexture = 0;
+	GLuint m_ParticleTexture2 = 0;
+	GLuint m_ParticleTexture3 = 0;
 
 
 	float g_Time = 0.f;

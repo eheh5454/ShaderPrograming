@@ -30,6 +30,9 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	m_SimpleVelShader = CompileShaders("./Shaders/SimpleVel.vs", "./Shaders/SimpleVel.fs");
 	m_FillAllShader = CompileShaders("./Shaders/FillAll.vs", "./Shaders/FillAll.fs");
 
+	m_ParticleTexture = CreatePngTexture("./Particles/p1.png");
+	m_ParticleTexture2 = CreatePngTexture("./Particles/p2.png");
+
 	//Create VBOs
 	CreateVertexBufferObjects();
 }
@@ -96,7 +99,7 @@ void Renderer::CreateVertexBufferObjects()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);*/
 
 	//GenQuads(1000);
-	//GenQuads_New(200000);
+	GenQuads_New(2000);
 	//CreateGridMesh();
 }
 
@@ -815,17 +818,23 @@ void Renderer::Lecture5()
 
 void Renderer::Lecture6()
 {
-	glUseProgram(m_SimpleVelShader);
+	glUseProgram(m_FillAllShader);
 
-	GLuint uTime = glGetUniformLocation(m_SimpleVelShader, "u_Time");
+	GLuint uTime = glGetUniformLocation(m_FillAllShader, "u_Time");
 	glUniform1f(uTime, g_Time);
 	g_Time += 0.0001f;
 
-	GLuint aPos = glGetAttribLocation(m_SimpleVelShader, "a_Position");	
-	GLuint ratio_amp = glGetAttribLocation(m_SimpleVelShader, "ratio_amp");
-	GLuint aStartLife = glGetAttribLocation(m_SimpleVelShader, "a_StartLife");
-	GLuint aVel = glGetAttribLocation(m_SimpleVelShader, "a_Vel");
-	GLuint Value = glGetAttribLocation(m_SimpleVelShader, "Value");
+	int uniformTex = glGetUniformLocation(m_FillAllShader, "uTexSampler");
+	glUniform1i(uniformTex, 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_ParticleTexture);
+
+
+	GLuint aPos = glGetAttribLocation(m_FillAllShader, "a_Position");
+	GLuint ratio_amp = glGetAttribLocation(m_FillAllShader, "ratio_amp");
+	GLuint aStartLife = glGetAttribLocation(m_FillAllShader, "a_StartLife");
+	GLuint aVel = glGetAttribLocation(m_FillAllShader, "a_Vel");
+	GLuint Value = glGetAttribLocation(m_FillAllShader, "Value");
 	
 	glEnableVertexAttribArray(aPos);
 	glEnableVertexAttribArray(aStartLife);
@@ -853,21 +862,21 @@ void Renderer::Lecture6()
 
 void Renderer::Lecture7()
 {
-	glUseProgram(m_SimpleVelShader);
+	glUseProgram(m_FillAllShader);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	GLuint uTime = glGetUniformLocation(m_SimpleVelShader, "u_Time");
+	GLuint uTime = glGetUniformLocation(m_FillAllShader, "u_Time");
 	glUniform1f(uTime, g_Time);
-	g_Time += 0.001f;
+	g_Time += 0.0001f;
 
-	GLuint aPos = glGetAttribLocation(m_SimpleVelShader, "a_Position");
-	GLuint ratio_amp = glGetAttribLocation(m_SimpleVelShader, "ratio_amp");
-	GLuint aStartLife = glGetAttribLocation(m_SimpleVelShader, "a_StartLife");
-	GLuint aVel = glGetAttribLocation(m_SimpleVelShader, "a_Vel");
-	GLuint Value = glGetAttribLocation(m_SimpleVelShader, "Value");
-	GLuint Color = glGetAttribLocation(m_SimpleVelShader, "a_color");
+	GLuint aPos = glGetAttribLocation(m_FillAllShader, "a_Position");
+	GLuint ratio_amp = glGetAttribLocation(m_FillAllShader, "ratio_amp");
+	GLuint aStartLife = glGetAttribLocation(m_FillAllShader, "a_StartLife");
+	GLuint aVel = glGetAttribLocation(m_FillAllShader, "a_Vel");
+	GLuint Value = glGetAttribLocation(m_FillAllShader, "Value");
+	GLuint Color = glGetAttribLocation(m_FillAllShader, "a_color");
 
 	glEnableVertexAttribArray(aPos);
 	glEnableVertexAttribArray(aStartLife);
@@ -924,4 +933,12 @@ void Renderer::Lecture8()
 
 	glDisableVertexAttribArray(aPos);
 	glDisableVertexAttribArray(aRG);
+}
+
+void Renderer::FillAll()
+{
+	glUseProgram(m_FillAllShader);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
