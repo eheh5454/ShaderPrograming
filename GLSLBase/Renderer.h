@@ -50,6 +50,8 @@ public:
 
 	void FillAll();
 
+	void DrawSimpleTexture();
+
 
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
@@ -70,11 +72,13 @@ private:
 	
 	GLuint m_VBORect4 = 0; 
 	GLuint m_VBOColor = 0;
+	GLuint m_VBOTexture = 0;
 
 	//shaders
 	GLuint m_SolidRectShader = 0;
 	GLuint m_SimpleVelShader = 0;
 	GLuint m_FillAllShader = 0;
+	GLuint m_TextureShader = 0;
 
 	//textures
 	GLuint m_ParticleTexture = 0;
