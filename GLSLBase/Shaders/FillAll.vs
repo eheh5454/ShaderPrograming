@@ -51,7 +51,7 @@ void main()
 		newPos = newPos + a_Vel * newTime +  0.5 * c_Gravity * newTime * newTime;
 
 		vec3 vSin = a_Vel * c_RP;
-		newPos = newPos + vSin * sin(newTime * PI * 2 * ratio) * amp;
+		newPos = newPos + vSin * sin(newTime * PI * 2 * ratio * 4) * amp;
 
 		newalpha = pow(1 - newTime / lifeTime, 30);
 	}

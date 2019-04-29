@@ -116,6 +116,8 @@ void Renderer::CreateVertexBufferObjects()
 
 	//GenQuads(1000);
 	GenQuads_New(2000);
+
+	CreateMyTexture();
 	//CreateGridMesh();
 }
 
@@ -402,12 +404,39 @@ GLuint Renderer::CreatePngTexture(char * filePath)
 	return temp;
 }
 
+void Renderer::CreateMyTexture()
+{
+	static const GLulong checkerboard[] =
+	{
+	0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000,
+	0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF,
+	0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000,
+	0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF,
+	0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000,
+	0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF,
+	0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000,
+	0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF
+	};
+
+	glGenTextures(1, &m_MyTexture);
+	glBindTexture(GL_TEXTURE_2D, m_MyTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 8, 8, 0, GL_RGBA, GL_UNSIGNED_BYTE, checkerboard);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+
+}
+
 GLuint Renderer::CreateBmpTexture(char * filePath)
 {
 	//Load Bmp: Load file and decode image.
 	unsigned int width, height;
 	unsigned char * bmp
 		= loadBMPRaw(filePath, width, height);
+
+	
 
 	if (bmp == NULL)
 	{
@@ -975,6 +1004,37 @@ void Renderer::DrawSimpleTexture()
 	GLuint aPos = glGetAttribLocation(m_TextureShader, "a_Position");
 	GLuint aUV = glGetAttribLocation(m_TextureShader, "a_UV");
 	
+
+	glEnableVertexAttribArray(aPos);
+	glEnableVertexAttribArray(aUV);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOTexture);
+	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
+	glVertexAttribPointer(aUV, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (GLvoid*)(sizeof(float) * 3));
+
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glDisableVertexAttribArray(aPos);
+	glDisableVertexAttribArray(aUV);
+}
+
+void Renderer::DrawCheckerboard()
+{
+	glUseProgram(m_TextureShader);
+
+	GLuint uTime = glGetUniformLocation(m_TextureShader, "u_Time");
+	glUniform1f(uTime, g_Time);
+	g_Time += 0.0001f;
+
+	int uniformTex = glGetUniformLocation(m_TextureShader, "u_Texture");
+	glUniform1i(uniformTex, 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_MyTexture);
+
+	GLuint aPos = glGetAttribLocation(m_TextureShader, "a_Position");
+	GLuint aUV = glGetAttribLocation(m_TextureShader, "a_UV");
+
 
 	glEnableVertexAttribArray(aPos);
 	glEnableVertexAttribArray(aUV);

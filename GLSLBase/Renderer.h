@@ -52,6 +52,8 @@ public:
 
 	void DrawSimpleTexture();
 
+	void DrawCheckerboard();
+
 
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
@@ -60,6 +62,8 @@ private:
 	GLuint CompileShaders(char* filenameVS, char* filenameFS);
 	void CreateVertexBufferObjects(); 
 	unsigned char * Renderer::loadBMPRaw(const char * imagepath, unsigned int& outWidth, unsigned int& outHeight);
+	void CreateMyTexture();
+	
 
 	bool m_Initialized = false;
 	
@@ -84,6 +88,8 @@ private:
 	GLuint m_ParticleTexture = 0;
 	GLuint m_ParticleTexture2 = 0;
 	GLuint m_ParticleTexture3 = 0;
+
+	GLuint m_MyTexture = 0;
 
 
 	float g_Time = 0.f;
