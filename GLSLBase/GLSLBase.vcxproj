@@ -175,6 +175,8 @@
   <ItemGroup>
     <None Include="Shaders\FillAll.fs" />
     <None Include="Shaders\FillAll.vs" />
+    <None Include="Shaders\RGBTexture.fs" />
+    <None Include="Shaders\RGBTexture.vs" />
     <None Include="Shaders\SimpleTexture.fs" />
     <None Include="Shaders\SimpleTexture.vs" />
     <None Include="Shaders\SimpleVel.fs" />

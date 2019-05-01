@@ -53,7 +53,8 @@ public:
 	void DrawSimpleTexture();
 
 	void DrawCheckerboard();
-
+	
+	void DrawRGBTexture();
 
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
@@ -83,11 +84,13 @@ private:
 	GLuint m_SimpleVelShader = 0;
 	GLuint m_FillAllShader = 0;
 	GLuint m_TextureShader = 0;
+	GLuint m_RGBTextureShader = 0;
 
 	//textures
 	GLuint m_ParticleTexture = 0;
 	GLuint m_ParticleTexture2 = 0;
 	GLuint m_ParticleTexture3 = 0;
+	GLuint m_RGBTexture = 0;
 
 	GLuint m_MyTexture = 0;
 

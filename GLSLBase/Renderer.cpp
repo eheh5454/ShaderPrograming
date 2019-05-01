@@ -30,9 +30,11 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	m_SimpleVelShader = CompileShaders("./Shaders/SimpleVel.vs", "./Shaders/SimpleVel.fs");
 	m_FillAllShader = CompileShaders("./Shaders/FillAll.vs", "./Shaders/FillAll.fs");
 	m_TextureShader = CompileShaders("./Shaders/SimpleTexture.vs", "./Shaders/SimpleTexture.fs");
+	m_RGBTextureShader = CompileShaders("./Shaders/RGBTexture.vs", "./Shaders/RGBTexture.fs");
 
 	m_ParticleTexture = CreatePngTexture("./Particles/p1.png");
 	m_ParticleTexture2 = CreatePngTexture("./Particles/p2.png");
+	m_RGBTexture = CreatePngTexture("./Particles/rgb.png");
 
 	//Create VBOs
 	CreateVertexBufferObjects();
@@ -1034,6 +1036,37 @@ void Renderer::DrawCheckerboard()
 
 	GLuint aPos = glGetAttribLocation(m_TextureShader, "a_Position");
 	GLuint aUV = glGetAttribLocation(m_TextureShader, "a_UV");
+
+
+	glEnableVertexAttribArray(aPos);
+	glEnableVertexAttribArray(aUV);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOTexture);
+	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
+	glVertexAttribPointer(aUV, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (GLvoid*)(sizeof(float) * 3));
+
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glDisableVertexAttribArray(aPos);
+	glDisableVertexAttribArray(aUV);
+}
+
+void Renderer::DrawRGBTexture()
+{
+	glUseProgram(m_RGBTextureShader);
+
+	GLuint uTime = glGetUniformLocation(m_RGBTextureShader, "u_Time");
+	glUniform1f(uTime, g_Time);
+	g_Time += 0.0001f;
+
+	int uniformTex = glGetUniformLocation(m_RGBTextureShader, "u_Texture");
+	glUniform1i(uniformTex, 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_RGBTexture);
+
+	GLuint aPos = glGetAttribLocation(m_RGBTextureShader, "a_Position");
+	GLuint aUV = glGetAttribLocation(m_RGBTextureShader, "a_UV");
 
 
 	glEnableVertexAttribArray(aPos);
