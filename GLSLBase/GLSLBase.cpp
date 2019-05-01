@@ -36,7 +36,7 @@ void RenderScene(void)
 
 	//g_Renderer->Lecture7();
 
-	g_Renderer->DrawCheckerboard();
+	g_Renderer->DrawSimpleTexture();
 
 	glutSwapBuffers();
 }

@@ -11,11 +11,26 @@ void main()
 {	
 	
 	
-	vec4 newColor = texture(u_Texture, v_UV);
-	vec2 newTex = fract(v_UV * 3);
+
+	//ºí·¯ 
+	vec2 newTex[5];
+	vec4 newColor[5];
+	newTex[0]= vec2(v_UV.x, v_UV.y);
+	newTex[1] = vec2(v_UV.x - 1/256, v_UV.y);
+	newTex[2] = vec2(v_UV.x + 1/256, v_UV.y);
+	newTex[3] = vec2(v_UV.x, v_UV.y - 1/256);
+	newTex[4] = vec2(v_UV.x, v_UV.y + 1/256);
+	newColor[0] = texture(u_Texture, newTex[0]);
+	newColor[1] = texture(u_Texture, newTex[1]);
+	newColor[2] = texture(u_Texture, newTex[2]);
+	newColor[3] = texture(u_Texture, newTex[3]);
+	newColor[4] = texture(u_Texture, newTex[4]);
+	vec4 finalColor = newColor[0]+newColor[1]+newColor[2]+newColor[3]+newColor[4];
+	finalColor /= 5;
+	FragColor = finalColor;
 
 
-	newColor = texture(u_Texture, newTex);
+
+
 	
-	FragColor = newColor;
 }
