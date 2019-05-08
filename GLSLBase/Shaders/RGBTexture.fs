@@ -3,6 +3,7 @@
 layout(location=0) out vec4 FragColor;
 
 uniform sampler2D u_Texture;
+uniform sampler2D u_Texture2;
 uniform float u_Time;
 
 in vec2 v_UV;
@@ -50,5 +51,27 @@ void main()
 	newUV3.y += fract(v_UV.y *3.0)/3.0;
 
 	FragColor = texture(u_Texture,newUV3);
+
+	//벽돌쌓기, 시험 출제 
+	vec2 newUV4 = v_UV;
+
+	vec2 newUV5 = v_UV;
+	newUV5.y = 1 - newUV5.y;
+	newUV5.x /= 2.f;	
+
+	vec4 newTexColor; 
+	vec2 newTex2 = vec2(v_UV.x, 1-v_UV.y);
+
+	if(newTex2.x < 0.5)
+	{
+		newTexColor = texture(u_Texture2,vec2(newTex2.x*2,newTex2.y));
+	}
+	else
+	{
+		newTexColor = texture(u_Texture,vec2(newTex2.x*2,newTex2.y));
+	}
+
+	
+	FragColor = newTexColor;
 	
 }

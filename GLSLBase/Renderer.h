@@ -56,6 +56,8 @@ public:
 	
 	void DrawRGBTexture();
 
+	void DrawMultiTexture();
+
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
 	bool ReadFile(char* filename, std::string *target);
@@ -91,12 +93,18 @@ private:
 	GLuint m_ParticleTexture2 = 0;
 	GLuint m_ParticleTexture3 = 0;
 	GLuint m_RGBTexture = 0;
+	GLuint m_DIgimonTextures = 0;
+	GLuint m_DIgimonTextures2 = 0;
+	GLuint m_DIgimonTextures3 = 0;
+	GLuint m_DIgimonTextures4 = 0;
 
 	GLuint m_MyTexture = 0;
 
 
 	float g_Time = 0.f;
 	float scale_speed = 0.0001f;
+
+	float tex_int = 0;
 
 	int Quad_num = 0;
 
