@@ -58,6 +58,8 @@ public:
 
 	void DrawMultiTexture();
 
+	void DrawOneTexture();
+
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
 	bool ReadFile(char* filename, std::string *target);
@@ -87,6 +89,7 @@ private:
 	GLuint m_FillAllShader = 0;
 	GLuint m_TextureShader = 0;
 	GLuint m_RGBTextureShader = 0;
+	GLuint m_OneTextureShader = 0;
 
 	//textures
 	GLuint m_ParticleTexture = 0;
@@ -97,6 +100,7 @@ private:
 	GLuint m_DIgimonTextures2 = 0;
 	GLuint m_DIgimonTextures3 = 0;
 	GLuint m_DIgimonTextures4 = 0;
+	GLuint m_OneTexture = 0;
 
 	GLuint m_MyTexture = 0;
 
@@ -114,6 +118,9 @@ private:
 
 	float x = 0.0001f; 
 	float y = 0.f;
+
+	int select_num = 0; //단일 텍스처에서 숫자 선택 
+	
 
 	int quad_vertex_count;
 
