@@ -33,6 +33,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	//m_RGBTextureShader = CompileShaders("./Shaders/RGBTexture.vs", "./Shaders/RGBTexture.fs");
 	m_OneTextureShader = CompileShaders("./Shaders/OneTexture.vs", "./Shaders/OneTexture.fs");
 	m_SpriteShader = CompileShaders("./Shaders/SpriteShader.vs", "./Shaders/SpriteShader.fs");
+	m_VSSandboxShader = CompileShaders("./Shaders/FSSandbox.vs", "./Shaders/FSSandbox.fs");
 
 	m_ParticleTexture = CreatePngTexture("./Particles/p1.png");
 	m_ParticleTexture2 = CreatePngTexture("./Particles/p2.png");
@@ -42,7 +43,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	m_DIgimonTextures3 = CreatePngTexture("./Particles/metalgreymon.png");
 	m_DIgimonTextures4 = CreatePngTexture("./Particles/wargreymon.png");
 	m_OneTexture = CreatePngTexture("./Particles/123456789.png");
-	m_DoraemonTexture = CreatePngTexture("./Particles/bear.png");
+	m_BearTexture = CreatePngTexture("./Particles/bear.png");
 
 	//Create VBOs
 	CreateVertexBufferObjects();
@@ -128,7 +129,7 @@ void Renderer::CreateVertexBufferObjects()
 	GenQuads_New(2000);
 
 	CreateMyTexture();
-	//CreateGridMesh();
+	CreateGridMesh();
 }
 
 void Renderer::CreateGridMesh()
@@ -506,7 +507,11 @@ void Renderer::Test()
 
 void Renderer::DrawGrid()
 {
-	glUseProgram(m_SolidRectShader);
+	glUseProgram(m_VSSandboxShader);
+
+	GLuint uTime = glGetUniformLocation(m_VSSandboxShader, "u_Time");
+	glUniform1f(uTime, g_Time);
+	g_Time += 0.0005f;
 	
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBOGridMesh);
@@ -1208,7 +1213,7 @@ void Renderer::DrawSprite(GLuint num)
 	
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_DoraemonTexture);
+	glBindTexture(GL_TEXTURE_2D, m_BearTexture);
 	
 
 	GLuint aPos = glGetAttribLocation(m_SpriteShader, "a_Position");

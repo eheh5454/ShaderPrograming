@@ -19,9 +19,7 @@ void main()
    newUV.x = newUV.x / u_Resolx + x_index / float(u_Resolx);
    newUV.y = newUV.y / u_Resoly + y_index / float(u_Resoly);
 
-   //FragColor = newColor;	
-
-   
+   //FragColor = newColor;	   
 
    FragColor = texture(u_Texture,newUV);
 	

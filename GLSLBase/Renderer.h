@@ -94,6 +94,7 @@ private:
 	GLuint m_RGBTextureShader = 0;
 	GLuint m_OneTextureShader = 0;
 	GLuint m_SpriteShader = 0;
+	GLuint m_VSSandboxShader = 0;
 
 	//textures
 	GLuint m_ParticleTexture = 0;
@@ -105,7 +106,7 @@ private:
 	GLuint m_DIgimonTextures3 = 0;
 	GLuint m_DIgimonTextures4 = 0;
 	GLuint m_OneTexture = 0;
-	GLuint m_DoraemonTexture = 0;
+	GLuint m_BearTexture = 0;
 
 	GLuint m_MyTexture = 0;
 
