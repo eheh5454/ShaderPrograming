@@ -32,6 +32,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	m_TextureShader = CompileShaders("./Shaders/SimpleTexture.vs", "./Shaders/SimpleTexture.fs");
 	//m_RGBTextureShader = CompileShaders("./Shaders/RGBTexture.vs", "./Shaders/RGBTexture.fs");
 	m_OneTextureShader = CompileShaders("./Shaders/OneTexture.vs", "./Shaders/OneTexture.fs");
+	m_SpriteShader = CompileShaders("./Shaders/SpriteShader.vs", "./Shaders/SpriteShader.fs");
 
 	m_ParticleTexture = CreatePngTexture("./Particles/p1.png");
 	m_ParticleTexture2 = CreatePngTexture("./Particles/p2.png");
@@ -41,6 +42,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	m_DIgimonTextures3 = CreatePngTexture("./Particles/metalgreymon.png");
 	m_DIgimonTextures4 = CreatePngTexture("./Particles/wargreymon.png");
 	m_OneTexture = CreatePngTexture("./Particles/123456789.png");
+	m_DoraemonTexture = CreatePngTexture("./Particles/bear.png");
 
 	//Create VBOs
 	CreateVertexBufferObjects();
@@ -1171,6 +1173,46 @@ void Renderer::DrawOneTexture()
 
 	GLuint aPos = glGetAttribLocation(m_OneTextureShader, "a_Position");
 	GLuint aUV = glGetAttribLocation(m_OneTextureShader, "a_UV");
+
+
+	glEnableVertexAttribArray(aPos);
+	glEnableVertexAttribArray(aUV);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOTexture);
+	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
+	glVertexAttribPointer(aUV, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (GLvoid*)(sizeof(float) * 3));
+
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glDisableVertexAttribArray(aPos);
+	glDisableVertexAttribArray(aUV);
+}
+
+void Renderer::DrawSprite(GLuint num)
+{
+	glUseProgram(m_SpriteShader);
+
+	GLuint uTime = glGetUniformLocation(m_SpriteShader, "u_Time");
+	glUniform1f(uTime, g_Time);
+	g_Time += 0.0001f;
+
+	GLuint uNumber = glGetUniformLocation(m_SpriteShader, "u_Number");
+	glUniform1f(uNumber, float(num));
+
+	GLuint Resolx = glGetUniformLocation(m_SpriteShader, "u_Resolx");
+	glUniform1f(Resolx, 8.f );
+
+	GLuint Resoly = glGetUniformLocation(m_SpriteShader, "u_Resoly");
+	glUniform1f(Resoly, 8.f);
+	
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_DoraemonTexture);
+	
+
+	GLuint aPos = glGetAttribLocation(m_SpriteShader, "a_Position");
+	GLuint aUV = glGetAttribLocation(m_SpriteShader, "a_UV");
 
 
 	glEnableVertexAttribArray(aPos);

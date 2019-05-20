@@ -65,6 +65,12 @@
     <None Include="Shaders\OneTexture.vs">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shaders\SpriteShader.fs">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\SpriteShader.vs">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

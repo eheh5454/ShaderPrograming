@@ -59,6 +59,9 @@ public:
 	void DrawMultiTexture();
 
 	void DrawOneTexture();
+	
+	void DrawSprite(GLuint num);
+
 
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
@@ -90,6 +93,7 @@ private:
 	GLuint m_TextureShader = 0;
 	GLuint m_RGBTextureShader = 0;
 	GLuint m_OneTextureShader = 0;
+	GLuint m_SpriteShader = 0;
 
 	//textures
 	GLuint m_ParticleTexture = 0;
@@ -101,6 +105,7 @@ private:
 	GLuint m_DIgimonTextures3 = 0;
 	GLuint m_DIgimonTextures4 = 0;
 	GLuint m_OneTexture = 0;
+	GLuint m_DoraemonTexture = 0;
 
 	GLuint m_MyTexture = 0;
 

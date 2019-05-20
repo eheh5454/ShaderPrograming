@@ -36,7 +36,14 @@ void RenderScene(void)
 
 	//g_Renderer->Lecture7();
 
-	g_Renderer->DrawOneTexture();
+	static int gAniNum = 0;
+	gAniNum++;
+	if (gAniNum > 63)
+		gAniNum = 0;
+
+	Sleep(100);
+
+	g_Renderer->DrawSprite(gAniNum);
 
 	glutSwapBuffers();
 }
