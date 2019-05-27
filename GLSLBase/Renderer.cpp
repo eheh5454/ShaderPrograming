@@ -512,12 +512,20 @@ void Renderer::DrawGrid()
 	GLuint uTime = glGetUniformLocation(m_VSSandboxShader, "u_Time");
 	glUniform1f(uTime, g_Time);
 	g_Time += 0.0005f;
+
+	GLuint uTex = glGetUniformLocation(m_VSSandboxShader, "u_TextureSampler");
+	glUniform1i(uTex, 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_DIgimonTextures);
+
+	int attribPosition = glGetAttribLocation(m_VSSandboxShader, "a_Position");
+	glEnableVertexAttribArray(attribPosition);
 	
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBOGridMesh);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
 
-	glDrawArrays(GL_LINE_STRIP, 0, m_GridMesh_Count);
+	glDrawArrays(GL_TRIANGLES, 0, m_GridMesh_Count);
 
 	glDisableVertexAttribArray(0);
 
