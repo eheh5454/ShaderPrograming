@@ -509,6 +509,11 @@ void Renderer::DrawGrid()
 {
 	glUseProgram(m_VSSandboxShader);
 
+	GLfloat points[] = { 0, 0, 0.1, 0.1, 0.3, 0.3, -0.2, -0.2, -0.1, -0.1 };
+
+	GLuint uPoints = glGetUniformLocation(m_VSSandboxShader, "u_Points");
+	glUniform2fv(uPoints, 5, points);
+
 	GLuint uTime = glGetUniformLocation(m_VSSandboxShader, "u_Time");
 	glUniform1f(uTime, g_Time);
 	g_Time += 0.0005f;
@@ -525,7 +530,7 @@ void Renderer::DrawGrid()
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBOGridMesh);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
 
-	glDrawArrays(GL_TRIANGLES, 0, m_GridMesh_Count);
+	glDrawArrays(GL_LINE_STRIP, 0, m_GridMesh_Count);
 
 	glDisableVertexAttribArray(0);
 

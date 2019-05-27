@@ -9,9 +9,11 @@ out vec2 v_Tex;
 
 uniform float u_Time; //1.f
 
-void main()
+uniform vec2 u_Points[5];
+
+void Flag()
 {
-    vec3 newPos = a_Position;
+	vec3 newPos = a_Position;
 	// 맨왼쪽은 고정.
 
 	// 0~1
@@ -40,7 +42,92 @@ void main()
 	// 0~1, 0~1 tex coords
 	v_Tex = vec2(0.5f, 0.5f) + a_Position.xy;
 
-	gl_Position = vec4(
-	newPos, 1
-	);
+	gl_Position = vec4(newPos, 1);
+}
+
+//물방울 웨이브 
+void Wave()
+{
+	vec3 newPos = a_Position;
+	float grey = 0;
+
+	for(int i = 0; i < 5; i++)
+	{
+		vec2 target;
+		vec2 source;
+		target = a_Position.xy;
+		source = u_Points[i];
+		float dis = length(target - source) * 4 * PI * float(i);
+		grey += sin(dis - u_Time);
+	}
+	newPos.z += grey; 
+
+	gl_Position = vec4(newPos, 1);
+
+	v_Grey = (grey + 1.0) / 2.0;
+	v_Tex = vec2(0.5f, 0.5f) + a_Position.xy;	
+
+
+}
+
+void SphereMapping()
+{
+	float r = 0.5;
+	float newTime = 1 - fract(u_Time);
+
+	float beta = (a_Position.x + 0.5) * 2 * PI; //경도 
+	float theta = (a_Position.y + 0.5) * PI; //위도
+	//가중치 계산법 사용(1-t)x + ty
+	vec3 NewPos = (1 - newTime) * a_Position + newTime * vec3( 
+		r * sin(theta) * cos(beta),
+		r * sin(theta) * sin(beta),
+		r * cos(theta));
+
+	gl_Position = vec4(NewPos,1);
+	v_Grey = 1;
+
+}
+
+//mix함수 사용 
+void SphereMapping_Mix()
+{
+	
+	float grey = 0;
+
+	for(int i = 0; i < 5; i++)
+	{
+		vec2 target;
+		vec2 source;
+		target = a_Position.xy;
+		source = u_Points[i];
+		float dis = length(target - source) * 4 * PI * float(i);
+		grey += sin(dis - u_Time);
+	}
+
+	float r = abs(grey) * 0.1 + 0.5;
+	float newTime = 1 - fract(u_Time);
+
+	float beta = (a_Position.x + 0.5) * 2 * PI; //경도 
+	float theta = (a_Position.y + 0.5) * PI; //위도
+	
+	vec3 NewPos = vec3( 
+		r * sin(theta) * cos(beta),
+		r * sin(theta) * sin(beta),
+		r * cos(theta));
+
+	//vec3 originPos = a_Position.xyz; 
+
+	//vec3 Pos = mix(originPos,NewPos,newTime);
+
+	gl_Position = vec4(NewPos,1);
+	v_Grey = 1;
+
+}
+
+
+void main()
+{
+	//Flag();
+	//Wave();
+	SphereMapping_Mix();
 }

@@ -12,5 +12,7 @@ void main()
 {
 	vec2 newTex = v_Tex;
 	newTex.y = 1 - newTex.y;
-	FragColor = texture(u_TextureSampler, newTex) * v_Grey;
+	//FragColor = texture(u_TextureSampler, newTex) * v_Grey;
+
+	FragColor = vec4(v_Grey);
 }
