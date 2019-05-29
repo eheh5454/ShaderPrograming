@@ -45,7 +45,7 @@ void RenderScene(void)
 
 	/*g_Renderer->DrawSprite(gAniNum);*/
 
-	g_Renderer->DrawGrid();
+	g_Renderer->DrawProj();
 
 	glutSwapBuffers();
 }

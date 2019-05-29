@@ -179,6 +179,8 @@
     <None Include="Shaders\FSSandbox.vs" />
     <None Include="Shaders\OneTexture.fs" />
     <None Include="Shaders\OneTexture.vs" />
+    <None Include="Shaders\OrthoProjectionShader.fs" />
+    <None Include="Shaders\OrthoProjectionShader.vs" />
     <None Include="Shaders\RGBTexture.fs" />
     <None Include="Shaders\RGBTexture.vs" />
     <None Include="Shaders\SimpleTexture.fs" />

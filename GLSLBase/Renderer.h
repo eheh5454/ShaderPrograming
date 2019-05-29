@@ -62,6 +62,11 @@ public:
 	
 	void DrawSprite(GLuint num);
 
+	void InitMatrix();
+
+	void DrawProj();
+
+	void Cube();
 
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
@@ -85,6 +90,7 @@ private:
 	GLuint m_VBORect4 = 0; 
 	GLuint m_VBOColor = 0;
 	GLuint m_VBOTexture = 0;
+	GLuint m_VBO_Cube = 0;
 
 	//shaders
 	GLuint m_SolidRectShader = 0;
@@ -95,6 +101,7 @@ private:
 	GLuint m_OneTextureShader = 0;
 	GLuint m_SpriteShader = 0;
 	GLuint m_VSSandboxShader = 0;
+	GLuint m_OrthoProjectionShader = 0;
 
 	//textures
 	GLuint m_ParticleTexture = 0;
@@ -129,6 +136,14 @@ private:
 	
 
 	int quad_vertex_count;
+
+	glm::mat4 m_ViewMat4;
+	glm::mat4 m_ViewProjMat4;
+	glm::mat4 m_OrthoProjMat4;
+	glm::vec3 m_CameraPosVec3;
+	glm::vec3 m_CameraUpVec3;
+	glm::vec3 m_CameraLookatVec3;
+	glm::vec3 m_CameraMat;
 
 
 };

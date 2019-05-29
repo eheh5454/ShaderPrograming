@@ -129,5 +129,5 @@ void main()
 {
 	//Flag();
 	//Wave();
-	SphereMapping_Mix();
+	SphereMapping();
 }
