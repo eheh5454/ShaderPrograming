@@ -45,6 +45,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	m_DIgimonTextures4 = CreatePngTexture("./Particles/wargreymon.png");
 	m_OneTexture = CreatePngTexture("./Particles/123456789.png");
 	m_BearTexture = CreatePngTexture("./Particles/bear.png");
+	m_HeightTexture = CreatePngTexture("./Particles/heightmap.png");
 
 	//Create VBOs
 	CreateVertexBufferObjects();
@@ -56,14 +57,16 @@ void Renderer::InitMatrix()
 {
 	
 	m_OrthoProjMat4 = glm::ortho(-1.f,1.f,-1.f,1.f,0.f,2.f);
+	m_PerspecProjMat4 = glm::perspective(3.141592f * 0.5f, 1.f, 0.001f, 100.f);
 
-	m_CameraPosVec3 = glm::vec3(0.f,0.f, 1.f);
-	m_CameraUpVec3 = glm::vec3(0.f, 1.f, 0.f);
+	m_CameraPosVec3 = glm::vec3(0.f,-1.f, 0.2f);
+	m_CameraUpVec3 = glm::vec3(0.f, 0.f, 1.f);
 	m_CameraLookatVec3 = glm::vec3(0.f, 0.f, 0.f);
 
 	m_ViewMat4 = glm::lookAt(m_CameraPosVec3, m_CameraLookatVec3, m_CameraUpVec3);
 
-	m_ViewProjMat4 = m_OrthoProjMat4 * m_ViewMat4;
+	//m_ViewProjMat4 = m_OrthoProjMat4 * m_ViewMat4;
+	m_ViewProjMat4 = m_PerspecProjMat4 * m_ViewMat4;
 	
 
 }
@@ -1340,7 +1343,12 @@ void Renderer::DrawProj()
 	GLuint uTex = glGetUniformLocation(m_OrthoProjectionShader, "u_TextureSampler");
 	glUniform1i(uTex, 0);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_DIgimonTextures);
+	glBindTexture(GL_TEXTURE_2D, m_HeightTexture);
+
+	GLuint uTex2 = glGetUniformLocation(m_OrthoProjectionShader, "u_heightmap");
+	glUniform1i(uTex2, 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, m_HeightTexture);
 
 	GLuint uViewProjMat = glGetUniformLocation(m_OrthoProjectionShader, "u_ProjView");
 	glUniformMatrix4fv(uViewProjMat, 1, GL_FALSE, &m_ViewProjMat4[0][0]);

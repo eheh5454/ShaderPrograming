@@ -114,7 +114,7 @@ private:
 	GLuint m_DIgimonTextures4 = 0;
 	GLuint m_OneTexture = 0;
 	GLuint m_BearTexture = 0;
-
+	GLuint m_HeightTexture = 0;
 	GLuint m_MyTexture = 0;
 
 
@@ -140,10 +140,12 @@ private:
 	glm::mat4 m_ViewMat4;
 	glm::mat4 m_ViewProjMat4;
 	glm::mat4 m_OrthoProjMat4;
+	glm::mat4 m_PerspecProjMat4;
 	glm::vec3 m_CameraPosVec3;
 	glm::vec3 m_CameraUpVec3;
 	glm::vec3 m_CameraLookatVec3;
 	glm::vec3 m_CameraMat;
+	
 
 
 };
