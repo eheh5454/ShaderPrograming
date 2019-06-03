@@ -16,6 +16,8 @@ uniform mat4 u_ProjView;
 
 uniform sampler2D u_heightmap;
 
+
+
 out vec4 v_Color;
 
 void Flag()
@@ -58,6 +60,8 @@ void Height()
 	
 	float height = texture(u_heightmap, v_Tex).r;
 	vec3 newPos = vec3(a_Position.xy, a_Position.z + height * 0.2f);
+
+	v_Grey = height;
 
 	gl_Position = u_ProjView * vec4(newPos, 1.0);
 }

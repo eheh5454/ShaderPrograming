@@ -116,6 +116,8 @@ private:
 	GLuint m_BearTexture = 0;
 	GLuint m_HeightTexture = 0;
 	GLuint m_MyTexture = 0;
+	GLuint m_SnowTexture = 0;
+	GLuint m_GrassTexture = 0;
 
 
 	float g_Time = 0.f;

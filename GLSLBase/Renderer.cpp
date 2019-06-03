@@ -46,6 +46,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	m_OneTexture = CreatePngTexture("./Particles/123456789.png");
 	m_BearTexture = CreatePngTexture("./Particles/bear.png");
 	m_HeightTexture = CreatePngTexture("./Particles/heightmap.png");
+	m_GrassTexture = CreatePngTexture("./Particles/grass.png");
 
 	//Create VBOs
 	CreateVertexBufferObjects();
@@ -1349,6 +1350,11 @@ void Renderer::DrawProj()
 	glUniform1i(uTex2, 1);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, m_HeightTexture);
+
+	GLuint uTex3 = glGetUniformLocation(m_OrthoProjectionShader, "u_GrassTexture");
+	glUniform1i(uTex3, 2);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, m_GrassTexture);
 
 	GLuint uViewProjMat = glGetUniformLocation(m_OrthoProjectionShader, "u_ProjView");
 	glUniformMatrix4fv(uViewProjMat, 1, GL_FALSE, &m_ViewProjMat4[0][0]);
