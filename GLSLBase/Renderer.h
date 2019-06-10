@@ -68,6 +68,8 @@ public:
 
 	void Cube();
 
+	void DrawHeightMap();
+
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
 	bool ReadFile(char* filename, std::string *target);
@@ -102,6 +104,7 @@ private:
 	GLuint m_SpriteShader = 0;
 	GLuint m_VSSandboxShader = 0;
 	GLuint m_OrthoProjectionShader = 0;
+	GLuint m_VertexAnimationShader = 0;
 
 	//textures
 	GLuint m_ParticleTexture = 0;

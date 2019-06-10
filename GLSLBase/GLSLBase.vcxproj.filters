@@ -83,6 +83,12 @@
     <None Include="Shaders\OrthoProjectionShader.vs">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shaders\VertexAnimation.fs">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\VertexAnimation.vs">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

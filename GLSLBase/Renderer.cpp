@@ -35,6 +35,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	m_SpriteShader = CompileShaders("./Shaders/SpriteShader.vs", "./Shaders/SpriteShader.fs");
 	m_VSSandboxShader = CompileShaders("./Shaders/FSSandbox.vs", "./Shaders/FSSandbox.fs");
 	m_OrthoProjectionShader = CompileShaders("./Shaders/OrthoProjectionShader.vs", "./Shaders/OrthoProjectionShader.fs");
+	m_VertexAnimationShader = CompileShaders("./Shaders/VertexAnimation.vs", "./Shaders/VertexAnimation.fs");
 
 	m_ParticleTexture = CreatePngTexture("./Particles/p1.png");
 	m_ParticleTexture2 = CreatePngTexture("./Particles/p2.png");
@@ -60,7 +61,7 @@ void Renderer::InitMatrix()
 	m_OrthoProjMat4 = glm::ortho(-1.f,1.f,-1.f,1.f,0.f,2.f);
 	m_PerspecProjMat4 = glm::perspective(3.141592f * 0.5f, 1.f, 0.001f, 100.f);
 
-	m_CameraPosVec3 = glm::vec3(0.f,-1.f, 0.2f);
+	m_CameraPosVec3 = glm::vec3(0.f,-1.f, 0.6f);
 	m_CameraUpVec3 = glm::vec3(0.f, 0.f, 1.f);
 	m_CameraLookatVec3 = glm::vec3(0.f, 0.f, 0.f);
 
@@ -1402,4 +1403,57 @@ void Renderer::Cube()
 	glDisableVertexAttribArray(attribPosition);
 	glDisableVertexAttribArray(attribNormal);
 	glDisableVertexAttribArray(attribColor);
+}
+
+
+void Renderer::DrawHeightMap()
+{
+	glUseProgram(m_VertexAnimationShader);
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+
+	GLfloat Points[] = { -0.2, -0.2, 0.5, 0.5, 0.2,0.2, 0.3,0.3,-0.3 - 0.3 };
+	static float gTime = 0;
+	gTime += 0.0001f;
+
+	GLuint projView = glGetUniformLocation(m_VertexAnimationShader, "u_ProjView");
+
+	glUniformMatrix4fv(projView, 1, GL_FALSE, &m_ViewProjMat4[0][0]);
+
+	GLuint uTex = glGetUniformLocation(m_VertexAnimationShader, "u_Texture");
+	glUniform1i(uTex, 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_HeightTexture);
+
+	GLuint uHeight = glGetUniformLocation(m_VertexAnimationShader, "u_heightMapTexture");
+	glUniform1i(uHeight, 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, m_HeightTexture);
+
+	GLuint uSnow = glGetUniformLocation(m_VertexAnimationShader, "u_snowTexture");
+	glUniform1i(uSnow, 2);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, m_SnowTexture);
+
+	GLuint uGrass = glGetUniformLocation(m_VertexAnimationShader, "u_grassTexture");
+	glUniform1i(uGrass, 3);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, m_GrassTexture);
+
+	int attribPosition = glGetAttribLocation(m_VertexAnimationShader, "a_Position");
+
+	GLuint uTime = glGetUniformLocation(m_VertexAnimationShader, "u_Time");
+	glUniform1f(uTime, gTime);
+
+	GLuint uPoints = glGetUniformLocation(m_VertexAnimationShader, "u_Points");
+	glUniform2fv(uPoints, 5, Points);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOGridMesh);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+
+	glDrawArrays(GL_TRIANGLES, 0, m_GridMesh_Count);
+
+	glDisableVertexAttribArray(0);
 }

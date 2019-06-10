@@ -191,6 +191,8 @@
     <None Include="Shaders\SolidRect.vs" />
     <None Include="Shaders\SpriteShader.fs" />
     <None Include="Shaders\SpriteShader.vs" />
+    <None Include="Shaders\VertexAnimation.fs" />
+    <None Include="Shaders\VertexAnimation.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
