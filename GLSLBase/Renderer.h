@@ -70,6 +70,12 @@ public:
 
 	void DrawHeightMap();
 
+	void DrawTexture(GLuint tex, float x, float y, float sx, float sy);
+
+	GLuint CreateFBO(int sx, int sy, GLuint *tex);
+
+	void TestFBO();
+
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
 	bool ReadFile(char* filename, std::string *target);
@@ -105,6 +111,7 @@ private:
 	GLuint m_VSSandboxShader = 0;
 	GLuint m_OrthoProjectionShader = 0;
 	GLuint m_VertexAnimationShader = 0;
+	GLuint m_DrawTextureRectShader = 0;
 
 	//textures
 	GLuint m_ParticleTexture = 0;
@@ -121,7 +128,17 @@ private:
 	GLuint m_MyTexture = 0;
 	GLuint m_SnowTexture = 0;
 	GLuint m_GrassTexture = 0;
+	GLuint m_FBOTexture = 0; 
+	GLuint m_FBOTexture2 = 0;
+	GLuint m_FBOTexture3 = 0;
+	GLuint m_FBOTexture4 = 0;
 
+	GLuint depthBuffer;
+
+	GLuint m_FBO = 0;
+	GLuint m_FBO2 = 0;
+	GLuint m_FBO3 = 0;
+	GLuint m_FBO4 = 0;
 
 	float g_Time = 0.f;
 	float scale_speed = 0.0001f;

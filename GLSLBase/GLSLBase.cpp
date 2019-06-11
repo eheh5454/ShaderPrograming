@@ -17,8 +17,8 @@ but WITHOUT ANY WARRANTY.
 
 Renderer *g_Renderer = NULL;
 
-int g_WindowSizeX = 500;
-int g_WindowSizeY = 500;
+int g_WindowSizeX = 1024;
+int g_WindowSizeY = 1024;
 
 void RenderScene(void)
 {
@@ -45,7 +45,7 @@ void RenderScene(void)
 
 	/*g_Renderer->DrawSprite(gAniNum);*/
 
-	g_Renderer->DrawHeightMap();
+	g_Renderer->TestFBO();
 
 	glutSwapBuffers();
 }

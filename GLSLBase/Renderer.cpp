@@ -36,6 +36,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	m_VSSandboxShader = CompileShaders("./Shaders/FSSandbox.vs", "./Shaders/FSSandbox.fs");
 	m_OrthoProjectionShader = CompileShaders("./Shaders/OrthoProjectionShader.vs", "./Shaders/OrthoProjectionShader.fs");
 	m_VertexAnimationShader = CompileShaders("./Shaders/VertexAnimation.vs", "./Shaders/VertexAnimation.fs");
+	m_DrawTextureRectShader = CompileShaders("./Shaders/TextureRect.vs", "./Shaders/TextureRect.fs");
 
 	m_ParticleTexture = CreatePngTexture("./Particles/p1.png");
 	m_ParticleTexture2 = CreatePngTexture("./Particles/p2.png");
@@ -50,9 +51,14 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	m_GrassTexture = CreatePngTexture("./Particles/grass.png");
 
 	//Create VBOs
-	CreateVertexBufferObjects();
+	CreateVertexBufferObjects();	
 
 	InitMatrix();
+
+	m_FBO = CreateFBO(512, 512, &m_FBOTexture);
+	m_FBO2 = CreateFBO(512, 512, &m_FBOTexture2);
+	m_FBO3 = CreateFBO(512, 512, &m_FBOTexture3);
+	m_FBO4 = CreateFBO(512, 512, &m_FBOTexture4);
 }
 
 void Renderer::InitMatrix()
@@ -293,6 +299,43 @@ void Renderer::CreateGridMesh()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*(pointCountX - 1)*(pointCountY - 1) * 2 * 3 * 3, vertices, GL_STATIC_DRAW);
 }
 
+
+GLuint Renderer::CreateFBO(int sx, int sy, GLuint *tex)
+{
+	GLuint temptex = 0;
+	glGenTextures(1, &temptex);
+	glBindTexture(GL_TEXTURE_2D, temptex);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, sx, sy, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+	*tex = temptex;
+	
+	glGenRenderbuffers(1, &depthBuffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, sx, sy);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+
+	GLuint tempFBO;
+	glGenFramebuffers(1, &tempFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, tempFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, temptex, 0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
+
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+	{
+		std::cout << "Error while attach FBO" << endl;		
+		return 0;
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	return tempFBO;
+}
 
 void Renderer::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType)
 {
@@ -1456,4 +1499,82 @@ void Renderer::DrawHeightMap()
 	glDrawArrays(GL_TRIANGLES, 0, m_GridMesh_Count);
 
 	glDisableVertexAttribArray(0);
+}
+
+void Renderer::DrawTexture(GLuint tex, float x, float y, float sx, float sy)
+{
+	glUseProgram(m_DrawTextureRectShader);
+
+	GLuint uTime = glGetUniformLocation(m_DrawTextureRectShader, "u_Time");
+	glUniform1f(uTime, g_Time);
+	g_Time += 0.0005f;
+	GLuint uTexture = glGetUniformLocation(m_DrawTextureRectShader, "u_Texture");
+	glUniform1i(uTexture, 0);
+	GLuint uPos = glGetUniformLocation(m_DrawTextureRectShader, "u_Pos");
+	GLuint uSize = glGetUniformLocation(m_DrawTextureRectShader, "u_Size");
+	glUniform2f(uPos, x, y);
+	glUniform2f(uSize, sx, sy);
+
+	GLuint uniformTex = glGetUniformLocation(m_DrawTextureRectShader, "u_Texture");
+	glUniform1i(uniformTex, 0);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex);
+
+	GLuint aPos = glGetAttribLocation(m_DrawTextureRectShader, "a_Position");
+	GLuint aUV = glGetAttribLocation(m_DrawTextureRectShader, "a_UV");
+
+	glEnableVertexAttribArray(aPos);
+	glEnableVertexAttribArray(aUV);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOTexture);
+	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
+	glVertexAttribPointer(aUV, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (GLvoid*)(sizeof(float) * 3));
+
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glDisableVertexAttribArray(aPos);
+	glDisableVertexAttribArray(aUV);
+
+}
+
+void Renderer::TestFBO()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glClearDepth(1.0f);
+	glViewport(0, 0, 512, 512);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	DrawSprite(0);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO2);
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glClearDepth(1.0f);
+	glViewport(0, 0, 512, 512);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	DrawHeightMap();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO3);
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glClearDepth(1.0f);
+	glViewport(0, 0, 512, 512);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	DrawSprite(1);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO4);
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glClearDepth(1.0f);
+	glViewport(0, 0, 512, 512);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	DrawSprite(2);
+	
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glViewport(0, 0, 1024, 1024);
+	DrawTexture(m_FBOTexture, -0.5, -0.5, 1, 1);
+	DrawTexture(m_FBOTexture2, 0.5, -0.5, 1, 1);
+	DrawTexture(m_FBOTexture3, -0.5, 0.5, 1, 1);
+	DrawTexture(m_FBOTexture4, 0.5, 0.5, 1, 1);
+	
 }
