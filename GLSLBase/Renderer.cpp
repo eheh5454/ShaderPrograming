@@ -37,6 +37,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	m_OrthoProjectionShader = CompileShaders("./Shaders/OrthoProjectionShader.vs", "./Shaders/OrthoProjectionShader.fs");
 	m_VertexAnimationShader = CompileShaders("./Shaders/VertexAnimation.vs", "./Shaders/VertexAnimation.fs");
 	m_DrawTextureRectShader = CompileShaders("./Shaders/TextureRect.vs", "./Shaders/TextureRect.fs");
+	m_DrawHDRTextureRectShader = CompileShaders("./Shaders/HDRTextureRect.vs", "./Shaders/HDRTextureRect.fs");
 
 	m_ParticleTexture = CreatePngTexture("./Particles/p1.png");
 	m_ParticleTexture2 = CreatePngTexture("./Particles/p2.png");
@@ -55,10 +56,10 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 
 	InitMatrix();
 
-	m_FBO = CreateFBO(512, 512, &m_FBOTexture);
-	m_FBO2 = CreateFBO(512, 512, &m_FBOTexture2);
-	m_FBO3 = CreateFBO(512, 512, &m_FBOTexture3);
-	m_FBO4 = CreateFBO(512, 512, &m_FBOTexture4);
+	m_FBO = CreateFBO(512, 512, &m_FBOTexture, true);
+	m_FBO2 = CreateFBO(512, 512, &m_FBOTexture2, true);
+	m_FBO3 = CreateFBO(512, 512, &m_FBOTexture3, false);
+	m_FBO4 = CreateFBO(512, 512, &m_FBOTexture4, false);
 }
 
 void Renderer::InitMatrix()
@@ -300,7 +301,7 @@ void Renderer::CreateGridMesh()
 }
 
 
-GLuint Renderer::CreateFBO(int sx, int sy, GLuint *tex)
+GLuint Renderer::CreateFBO(int sx, int sy, GLuint *tex, bool isHDR)
 {
 	GLuint temptex = 0;
 	glGenTextures(1, &temptex);
@@ -311,6 +312,14 @@ GLuint Renderer::CreateFBO(int sx, int sy, GLuint *tex)
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, sx, sy, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+	if (isHDR)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, sx, sy, 0, GL_RGBA, GL_FLOAT, 0);
+	}
+	else
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, sx, sy, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+	}
 	*tex = temptex;
 	
 	glGenRenderbuffers(1, &depthBuffer);
@@ -811,7 +820,7 @@ void Renderer::GenQuads_New(int num)
 
 	float *Quad_vertex = new float[vertex_size];
 
-	float quad_size = 0.1f;
+	float quad_size = 0.01f;
 
 	for (int i = 0; i < countQuad; i++)
 	{
@@ -1015,37 +1024,35 @@ void Renderer::Lecture5()
 
 void Renderer::Lecture6()
 {
-	glUseProgram(m_FillAllShader);
+	glUseProgram(m_SimpleVelShader);
 
-	GLuint uTime = glGetUniformLocation(m_FillAllShader, "u_Time");
+	
+	GLuint uTime = glGetUniformLocation(m_SimpleVelShader, "u_Time");
 	glUniform1f(uTime, g_Time);
 	g_Time += 0.0001f;
 
-	int uniformTex = glGetUniformLocation(m_FillAllShader, "uTexSampler");
-	glUniform1i(uniformTex, 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_ParticleTexture);
+	GLuint aPos = glGetAttribLocation(m_SimpleVelShader, "a_Position");
+	GLuint ratio_amp = glGetAttribLocation(m_SimpleVelShader, "ratio_amp");
+	GLuint aStartLife = glGetAttribLocation(m_SimpleVelShader, "a_StartLife");
+	GLuint aVel = glGetAttribLocation(m_SimpleVelShader, "a_Vel");
+	GLuint Value = glGetAttribLocation(m_SimpleVelShader, "Value");
+	GLuint Color = glGetAttribLocation(m_SimpleVelShader, "a_color");
 
-
-	GLuint aPos = glGetAttribLocation(m_FillAllShader, "a_Position");
-	GLuint ratio_amp = glGetAttribLocation(m_FillAllShader, "ratio_amp");
-	GLuint aStartLife = glGetAttribLocation(m_FillAllShader, "a_StartLife");
-	GLuint aVel = glGetAttribLocation(m_FillAllShader, "a_Vel");
-	GLuint Value = glGetAttribLocation(m_FillAllShader, "Value");
-	
 	glEnableVertexAttribArray(aPos);
 	glEnableVertexAttribArray(aStartLife);
 	glEnableVertexAttribArray(ratio_amp);
 	glEnableVertexAttribArray(aVel);
 	glEnableVertexAttribArray(Value);
+	glEnableVertexAttribArray(Color);
 
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, m_QuadRect);
-	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 11, 0);
-	glVertexAttribPointer(aVel, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 11, (GLvoid*)(sizeof(float) * 3));
-	glVertexAttribPointer(aStartLife, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 11, (GLvoid*)(sizeof(float) * 6));	
-	glVertexAttribPointer(ratio_amp, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 11, (GLvoid*)(sizeof(float) * 8));
-	glVertexAttribPointer(Value, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 11, (GLvoid*)(sizeof(float) * 10));
+	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 15, 0);
+	glVertexAttribPointer(aVel, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 15, (GLvoid*)(sizeof(float) * 3));
+	glVertexAttribPointer(aStartLife, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 15, (GLvoid*)(sizeof(float) * 6));
+	glVertexAttribPointer(ratio_amp, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 15, (GLvoid*)(sizeof(float) * 8));
+	glVertexAttribPointer(Value, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 15, (GLvoid*)(sizeof(float) * 10));
+	glVertexAttribPointer(Color, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 15, (GLvoid*)(sizeof(float) * 11));
 
 	glDrawArrays(GL_TRIANGLES, 0, quad_vertex_count);
 	//glDrawArrays(GL_LINE_STRIP, 0, 6 * Quad_num * 3);
@@ -1055,6 +1062,7 @@ void Renderer::Lecture6()
 	glDisableVertexAttribArray(ratio_amp);
 	glDisableVertexAttribArray(aVel);
 	glDisableVertexAttribArray(Value);
+	glDisableVertexAttribArray(Color);
 }
 
 void Renderer::Lecture7()
@@ -1539,42 +1547,61 @@ void Renderer::DrawTexture(GLuint tex, float x, float y, float sx, float sy)
 
 }
 
-void Renderer::TestFBO()
+void Renderer::DrawHDRTexture(GLuint tex, float x, float y, float sx, float sy)
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
-	glClearColor(0.0, 0.0, 0.0, 0.0);
-	glClearDepth(1.0f);
-	glViewport(0, 0, 512, 512);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	DrawSprite(0);
+	glUseProgram(m_DrawHDRTextureRectShader);
+
+	GLuint uTime = glGetUniformLocation(m_DrawHDRTextureRectShader, "u_Time");
+	glUniform1f(uTime, g_Time);
+	g_Time += 0.0005f;
+	GLuint uTexture = glGetUniformLocation(m_DrawHDRTextureRectShader, "u_Texture");
+	glUniform1i(uTexture, 0);
+	GLuint uPos = glGetUniformLocation(m_DrawHDRTextureRectShader, "u_Pos");
+	GLuint uSize = glGetUniformLocation(m_DrawHDRTextureRectShader, "u_Size");
+	glUniform2f(uPos, x, y);
+	glUniform2f(uSize, sx, sy);
+
+	GLuint uniformTex = glGetUniformLocation(m_DrawHDRTextureRectShader, "u_Texture");
+	glUniform1i(uniformTex, 0);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex);
+
+	GLuint aPos = glGetAttribLocation(m_DrawHDRTextureRectShader, "a_Position");
+	GLuint aUV = glGetAttribLocation(m_DrawHDRTextureRectShader, "a_UV");
+
+	glEnableVertexAttribArray(aPos);
+	glEnableVertexAttribArray(aUV);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOTexture);
+	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
+	glVertexAttribPointer(aUV, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (GLvoid*)(sizeof(float) * 3));
+
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glDisableVertexAttribArray(aPos);
+	glDisableVertexAttribArray(aUV);
+}
+
+void Renderer::TestFBO()
+{	
 
 	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO2);
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClearDepth(1.0f);
 	glViewport(0, 0, 512, 512);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	DrawHeightMap();
-
-	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO3);
-	glClearColor(0.0, 0.0, 0.0, 0.0);
-	glClearDepth(1.0f);
-	glViewport(0, 0, 512, 512);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	DrawSprite(1);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO4);
-	glClearColor(0.0, 0.0, 0.0, 0.0);
-	glClearDepth(1.0f);
-	glViewport(0, 0, 512, 512);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	DrawSprite(2);
+	DrawSprite(0);
+	Lecture6();
+	
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glViewport(0, 0, 1024, 1024);
-	DrawTexture(m_FBOTexture, -0.5, -0.5, 1, 1);
-	DrawTexture(m_FBOTexture2, 0.5, -0.5, 1, 1);
-	DrawTexture(m_FBOTexture3, -0.5, 0.5, 1, 1);
-	DrawTexture(m_FBOTexture4, 0.5, 0.5, 1, 1);
+	
+	DrawHDRTexture(m_FBOTexture2, 0.0, 0.0, 2, 2);
+	
 	
 }
+

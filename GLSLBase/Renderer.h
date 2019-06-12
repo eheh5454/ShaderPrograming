@@ -72,7 +72,9 @@ public:
 
 	void DrawTexture(GLuint tex, float x, float y, float sx, float sy);
 
-	GLuint CreateFBO(int sx, int sy, GLuint *tex);
+	void DrawHDRTexture(GLuint tex, float x, float y, float sx, float sy);
+
+	GLuint CreateFBO(int sx, int sy, GLuint *tex, bool isHDR);
 
 	void TestFBO();
 
@@ -112,6 +114,7 @@ private:
 	GLuint m_OrthoProjectionShader = 0;
 	GLuint m_VertexAnimationShader = 0;
 	GLuint m_DrawTextureRectShader = 0;
+	GLuint m_DrawHDRTextureRectShader = 0;
 
 	//textures
 	GLuint m_ParticleTexture = 0;
